@@ -11,4 +11,5 @@ export interface ArchiveItem {
   tags: string[];
   difficulty: number;
   yearPublished: number;
+  downloadUrl?: string; // Optional URL for external downloads like Google Drive
 }

@@ -2,7 +2,7 @@ import { ArchiveItem } from '../types';
 
 export const mockArchives: ArchiveItem[] = [
   {
-    id: 'arch-m001',
+    id: 'skibidi',
     title: 'A Proof of the Twin Prime Conjecture for Special Cases',
     description: 'An extensive mathematical proof addressing specific boundary conditions of the Twin Prime Conjecture.',
     category: 'Mathematics',
@@ -11,7 +11,8 @@ export const mockArchives: ArchiveItem[] = [
     downloads: 12450,
     tags: ['number-theory', 'primes', 'proof'],
     difficulty: 5,
-    yearPublished: 2023
+    yearPublished: 2023,
+    downloadUrl: 'https://drive.google.com/file/d/1b9y8o5YHv3t_3cWLZfymyQ52_bwWkI1L/view?usp=sharing' // Example Google Drive direct download link
   },
   {
     id: 'arch-b001',

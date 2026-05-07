@@ -247,14 +247,27 @@ export default function App() {
                       <span className="text-[10px] font-mono text-neutral-500 bg-neutral-100 px-2 py-1 rounded-md shrink-0 border border-neutral-200">
                         Est. {item.yearPublished}
                       </span>
-                      <button
-                        onClick={() => handleMockDownload(item)}
-                        className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-                        title="Download"
-                      >
-                        <HardDriveDownload size={16} className="sm:mr-2" />
-                        <span className="hidden sm:inline">Download</span>
-                      </button>
+                      {item.downloadUrl ? (
+                        <a
+                          href={item.downloadUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                          title="Download External Link"
+                        >
+                          <HardDriveDownload size={16} className="sm:mr-2" />
+                          <span className="hidden sm:inline">Download</span>
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => handleMockDownload(item)}
+                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                          title="Download Mock"
+                        >
+                          <HardDriveDownload size={16} className="sm:mr-2" />
+                          <span className="hidden sm:inline">Download</span>
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 ))}
