@@ -33,7 +33,7 @@ export const mockArchives: ArchiveItem[] = [
     type: 'posn',
     tags: ['สอวน', 'ข้อสอบเเข่งขัน'],
     difficulty: 3,
-    yearPublished: 2567,
+    yearPublished: 2566,
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1ZlPkx2HYYOK3GDkf_3Ss8McfLMgjmj1p',
     isOfficialSource: true
   }

@@ -183,7 +183,7 @@ export default function App() {
         {/* Archive Grid/List */}
         <section className="pb-24">
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 border-b border-neutral-200 pb-4">
-            <h3 className="text-xl font-semibold">Results ({filteredArchives.length})</h3>
+            <h3 className="text-xl font-semibold">ผลลัพธ์ ({filteredArchives.length} รายการ)</h3>
             
             <div className="flex flex-wrap gap-4 items-center">
               <label className="flex items-center gap-2 text-sm font-medium text-neutral-600 cursor-pointer select-none">
@@ -233,57 +233,66 @@ export default function App() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.98 }}
-                    className="bg-white border border-neutral-200 rounded-xl overflow-hidden hover:border-neutral-400 transition-colors shadow-sm focus-within:ring-2 focus-within:ring-neutral-900 flex items-center p-3 gap-4"
+                    className="bg-white border border-neutral-200 rounded-xl overflow-hidden hover:border-neutral-400 transition-colors shadow-sm focus-within:ring-2 focus-within:ring-neutral-900 p-4 sm:p-3 flex flex-col sm:flex-row sm:items-center gap-4"
                   >
-                    <div className="shrink-0 hidden sm:block">
-                      <TypeIcon type={item.type} size={48} />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-base font-medium text-neutral-900 truncate">{item.title}</h4>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider shrink-0">{item.category}</span>
-                        <div className="flex flex-wrap gap-1.5 shrink-0">
-                          {item.tags.map(tag => (
-                            <span key={tag} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 text-[10px] font-mono rounded-md">
-                              #{tag}
-                            </span>
-                          ))}
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="shrink-0 sm:block">
+                        <div className="sm:hidden mt-0.5">
+                          <TypeIcon type={item.type} size={40} />
                         </div>
-                        {showDifficulty && <DifficultyBar level={item.difficulty} />}
+                        <div className="hidden sm:block">
+                          <TypeIcon type={item.type} size={48} />
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-base sm:text-lg font-medium text-neutral-900 leading-snug truncate sm:whitespace-normal line-clamp-2">{item.title}</h4>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 sm:mt-1.5">
+                          <span className="text-[10px] sm:text-xs font-mono text-neutral-500 uppercase tracking-wider shrink-0">{item.category}</span>
+                          <div className="flex flex-wrap gap-1.5 shrink-0">
+                            {item.tags.map(tag => (
+                              <span key={tag} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 text-[10px] font-mono rounded-md border border-neutral-200/60">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                          {showDifficulty && <DifficultyBar level={item.difficulty} />}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="shrink-0 pl-2 flex items-center gap-4">
-                      {!item.isOfficialSource && (
-                        <div className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-1 rounded-md text-[10px] uppercase tracking-wider font-semibold border border-amber-200 shrink-0" title="Unofficial Source">
-                          <span>ข้อสอบจากการจำ</span>
-                        </div>
-                      )}
-                      <span className="text-[10px] font-mono text-neutral-500 bg-neutral-100 px-2 py-1 rounded-md shrink-0 border border-neutral-200">
-                        {item.yearPublished}
-                      </span>
+                    <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 mt-1 sm:mt-0 border-t sm:border-t-0 border-neutral-100">
+                      <div className="flex items-center gap-2">
+                        {!item.isOfficialSource && (
+                          <div className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-1 rounded-md text-[10px] uppercase tracking-wider font-semibold border border-amber-200 shrink-0" title="Unofficial Source">
+                            <span>ข้อสอบจากการจำ</span>
+                          </div>
+                        )}
+                        <span className="text-[10px] font-mono text-neutral-500 bg-neutral-100 px-2 py-1 rounded-md shrink-0 border border-neutral-200">
+                          {item.yearPublished}
+                        </span>
+                      </div>
                       {item.downloadUrl ? (
                         <a
                           href={item.downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                           title="Download External Link"
                         >
-                          <HardDriveDownload size={16} className="sm:mr-2" />
-                          <span className="hidden sm:inline">Download</span>
+                          <HardDriveDownload size={16} className="mr-1.5 sm:mr-2" />
+                          <span>โหลดโจทย์</span>
                         </a>
                       ) : (
                         <button
                           onClick={() => handleMockDownload(item)}
-                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                          className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                           title="Download Mock"
                         >
-                          <HardDriveDownload size={16} className="sm:mr-2" />
-                          <span className="hidden sm:inline">Download</span>
+                          <HardDriveDownload size={16} className="mr-1.5 sm:mr-2" />
+                          <span>โหลดโจทย์</span>
                         </button>
                       )}
                     </div>
