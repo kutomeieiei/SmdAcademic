@@ -11,3 +11,13 @@
     @apply bg-neutral-50 text-neutral-900 font-sans antialiased selection:bg-neutral-900 selection:text-white;
   }
 }
+
+@media (max-width: 640px) {
+  html, body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  ::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}

@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Search, Dna, FlaskConical, Atom, Calculator, Cpu, Library, HardDriveDownload, BookOpen, BadgeCheck, XCircle } from 'lucide-react';
+import { Search, Dna, FlaskConical, Atom, Calculator, Cpu, Library, HardDriveDownload, BookOpen, BadgeCheck, XCircle, ChevronDown } from 'lucide-react';
 import { mockArchives } from './data/mockArchives';
 import { ArchiveItem, ArchiveCategory } from './types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -75,8 +75,17 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<ArchiveCategory | 'All'>('All');
   const [sortBy, setSortBy] = useState<'default' | 'year-desc' | 'year-asc' | 'difficulty-desc' | 'difficulty-asc'>('default');
   const [showDifficulty, setShowDifficulty] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
   
   const categories: (ArchiveCategory | 'All')[] = ['All', 'Mathematics', 'Biology', 'Chemistry', 'Physics'];
+
+  const sortOptions = [
+    { id: 'default', label: 'เรียงปกติ' },
+    { id: 'year-desc', label: 'Newest' },
+    { id: 'year-asc', label: 'Oldest' },
+    { id: 'difficulty-desc', label: 'Hardest' },
+    { id: 'difficulty-asc', label: 'Easiest' },
+  ];
 
   const filteredArchives = mockArchives.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -126,9 +135,7 @@ export default function App() {
             <h2 className="text-3xl font-semibold text-neutral-900 tracking-tight">About Me</h2>
             <div className="prose prose-neutral max-w-none text-neutral-700">
               <p className="text-lg">
-                Hello! I am the creator and curator of the Scholar Academic Archive. My passion lies in 
-                democratizing access to scientific knowledge, making peer-reviewed papers, experimental datasets, 
-                and breakthrough research available to everyone, everywhere.
+                ok doraymifasol
               </p>
               <div className="my-8 flex gap-4">
                 <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400&q=80" alt="Library" className="rounded-xl w-1/2 object-cover" />
@@ -136,14 +143,11 @@ export default function App() {
               </div>
               <h3>Mission</h3>
               <p>
-                Our mission is to index the world's most critical scientific papers and experimental datasets 
-                with open access forever. We organize them by discipline—from theoretical physics to modern biology—and 
-                ensure they are searchable and easy to download.
+                skibidi skibidi
               </p>
               <h3>Contact</h3>
               <p>
-                If you have questions, contributions, or just want to discuss science, feel free to reach out. 
-                Keep exploring!
+                tornado tornado
               </p>
             </div>
           </section>
@@ -195,17 +199,48 @@ export default function App() {
                 />
                 เเสดงความยาก
               </label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-white border border-neutral-200 text-neutral-700 text-sm rounded-lg focus:ring-neutral-900 focus:border-neutral-900 block w-full sm:w-auto p-2 outline-none shadow-sm font-medium"
-              >
-                <option value="default">เรียงปกติ</option>
-                <option value="year-desc">Newest</option>
-                <option value="year-asc">Oldest</option>
-                <option value="difficulty-desc">Hardest</option>
-                <option value="difficulty-asc">Easiest</option>
-              </select>
+              <div className="relative w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                  className="bg-white border border-neutral-200 text-neutral-700 hover:text-neutral-900 hover:border-neutral-300 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900 flex items-center justify-between gap-2 w-full sm:w-36 px-3 py-2 shadow-sm font-medium transition-all"
+                >
+                  <span>{sortOptions.find((o) => o.id === sortBy)?.label || 'เรียงปกติ'}</span>
+                  <ChevronDown size={16} className={`transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {isSortOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setIsSortOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-full sm:w-48 bg-white border border-neutral-200 rounded-xl shadow-lg z-20 py-1.5 overflow-hidden origin-top-right"
+                      >
+                        {sortOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => {
+                              setSortBy(option.id as any);
+                              setIsSortOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                              sortBy === option.id
+                                ? 'bg-neutral-100 text-neutral-900 font-medium'
+                                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
 
@@ -258,7 +293,9 @@ export default function App() {
                               </span>
                             ))}
                           </div>
-                          {showDifficulty && <DifficultyBar level={item.difficulty} />}
+                          <div className="hidden sm:block">
+                            {showDifficulty && <DifficultyBar level={item.difficulty} />}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -273,6 +310,9 @@ export default function App() {
                         <span className="text-[10px] font-mono text-neutral-500 bg-neutral-100 px-2 py-1 rounded-md shrink-0 border border-neutral-200">
                           {item.yearPublished}
                         </span>
+                        <div className="sm:hidden">
+                          {showDifficulty && <DifficultyBar level={item.difficulty} />}
+                        </div>
                       </div>
                       {item.downloadUrl ? (
                         <a
@@ -282,8 +322,7 @@ export default function App() {
                           className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                           title="Download External Link"
                         >
-                          <HardDriveDownload size={16} className="mr-1.5 sm:mr-2" />
-                          <span>โหลดโจทย์</span>
+                          <span>Download</span>
                         </a>
                       ) : (
                         <button
@@ -291,8 +330,7 @@ export default function App() {
                           className="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 text-white py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                           title="Download Mock"
                         >
-                          <HardDriveDownload size={16} className="mr-1.5 sm:mr-2" />
-                          <span>โหลดโจทย์</span>
+                          <span>Download</span>
                         </button>
                       )}
                     </div>
