@@ -16,6 +16,7 @@ const TypeIcon = ({ type, className, size = 24 }: { type: string, className?: st
   const getIconPath = () => {
     switch (type.toLowerCase()) {
       case 'posn': return 'https://drive.google.com/thumbnail?id=1bYZ03JwDRCJODvH9CIPRMazYqItUBrtv&sz=w400';
+      case 'tcas': return 'https://drive.google.com/thumbnail?id=1eS1Q7O3FyDwqGsm64DZxN6TBrOaoUMfI';
       default: return 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=128&q=80';
     }
   };
