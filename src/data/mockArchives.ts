@@ -12,6 +12,7 @@ export const mockArchives: ArchiveItem[] = [
     yearPublished: 2568,
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1KthxPXdSF0fwMeXuyFm9BuTF_ijt40J1',
     solutionUrl: 'https://drive.google.com/uc?export=view&id=1KthxPXdSF0fwMeXuyFm9BuTF_ijt40J1',
+    dateAdded: '2024-01-15',
     isOfficialSource: true
   },
   {
@@ -24,6 +25,7 @@ export const mockArchives: ArchiveItem[] = [
     difficulty: 4,
     yearPublished: 2567,
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1vj844pbYurcAhLHWX62MLvedw-jeIOIw',
+    dateAdded: '2024-02-20',
     isOfficialSource: true
   },
   {
@@ -36,6 +38,7 @@ export const mockArchives: ArchiveItem[] = [
     difficulty: 3,
     yearPublished: 2566,
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1ZlPkx2HYYOK3GDkf_3Ss8McfLMgjmj1p',
+    dateAdded: '2024-03-10',
     isOfficialSource: true
   },
   {
@@ -48,6 +51,7 @@ export const mockArchives: ArchiveItem[] = [
     difficulty: 3,
     yearPublished: 2568,
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1sq56VX0lR90eK2D8uVkVkb8W0j4d5vHC',
+    dateAdded: '2024-04-05',
     isOfficialSource: true
   }
 ];

@@ -17,6 +17,7 @@ export interface PortfolioItem {
 }
 
 export interface ArchiveItem {
+  id: string;
   title: string;
   description: string;
   category: string;
@@ -24,7 +25,8 @@ export interface ArchiveItem {
   tags: string[];
   difficulty: number;
   yearPublished: number;
-  downloadUrl?: string; // Optional URL for external downloads like Google Drive
-  solutionUrl?: string; // Optional URL for the solution
-  isOfficialSource: boolean; // Indicates if it's from an official source
+  dateAdded: string;
+  downloadUrl?: string;
+  solutionUrl?: string;
+  isOfficialSource: boolean;
 }

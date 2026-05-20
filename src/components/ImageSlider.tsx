@@ -52,7 +52,7 @@ export function ImageSlider() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0 w-full h-full"
         >
-          <div className="absolute inset-0 bg-black/40 z-10" />{" "}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60 z-10" />{" "}
           {/* Overlay overlay for better text readability */}
           <img
             src={images[currentIndex].url}
