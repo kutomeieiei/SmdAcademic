@@ -85,39 +85,46 @@ export function ImageSlider() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Cards layer */}
+      {/* Cards layer with 3D perspective */}
       <div
         className="absolute inset-0 flex items-center justify-center"
-        style={{ perspective: "1200px" }}
+        style={{ perspective: "1400px", transformStyle: "preserve-3d" }}
       >
         {slides.map((slide, index) => {
           const pos = getPosition(index);
           if (Math.abs(pos) > 2) return null;
 
           const absPos = Math.abs(pos);
+          const isCenter = pos === 0;
 
           return (
             <motion.div
               key={index}
-              className="absolute inset-y-8 sm:inset-y-10 md:inset-y-12 rounded-3xl overflow-hidden shadow-2xl"
-              style={{ width: "68%", left: "16%" }}
+              className="absolute inset-y-10 sm:inset-y-12 md:inset-y-14 rounded-3xl overflow-hidden shadow-2xl"
+              style={{
+                width: "62%",
+                left: "19%",
+                transformStyle: "preserve-3d",
+                backfaceVisibility: "hidden",
+              }}
               animate={{
-                x: `${pos * 68}%`,
-                scale: pos === 0 ? 1 : 0.88,
-                opacity: pos === 0 ? 1 : absPos === 1 ? 0.5 : 0,
+                x: `${pos * 55}%`,
+                scale: isCenter ? 1 : 0.78,
+                rotateY: isCenter ? 0 : pos > 0 ? -32 : 32,
+                z: isCenter ? 120 : -60,
+                opacity: isCenter ? 1 : absPos === 1 ? 0.55 : 0,
                 zIndex: 30 - absPos * 10,
-                filter: pos === 0
+                filter: isCenter
                   ? "brightness(1)"
                   : absPos === 1
-                    ? "brightness(0.55)"
+                    ? "brightness(0.5)"
                     : "brightness(0.3)",
-                borderRadius: pos === 0 ? "1.5rem" : "1.25rem",
               }}
               transition={{
                 type: "spring",
-                stiffness: 280,
-                damping: 32,
-                mass: 1.2,
+                stiffness: 220,
+                damping: 28,
+                mass: 1.4,
               }}
             >
               <img
@@ -142,7 +149,7 @@ export function ImageSlider() {
           className="absolute inset-0 z-40 flex flex-col items-center justify-center"
         >
           {/* Dark gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40" />
 
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center text-center px-6 sm:px-12 max-w-3xl w-full">
