@@ -8,6 +8,14 @@ export interface ExternalLinkItem {
   subjects: string[];
 }
 
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  tags: string[];
+}
+
 export interface ArchiveItem {
   title: string;
   description: string;
