@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Dna,
@@ -21,9 +21,8 @@ import {
   ArrowLeft,
   Sun,
   Moon,
-  Menu,
-  X,
-  LayoutGrid,
+  MoreVertical,
+  Mic,
 } from "lucide-react";
 import { mockArchives } from "./data/mockArchives";
 import { externalLinks } from "./data/externalLinks";
@@ -111,39 +110,6 @@ const handleMockDownload = (item: ArchiveItem) => {
   document.body.removeChild(element);
 };
 
-const useCountUp = (target: number, duration: number = 1500) => {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return count;
-};
-
-const StatCard = ({ label, value, suffix }: { label: string; value: number; suffix: string }) => {
-  const count = useCountUp(value);
-  return (
-    <div className="bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 sm:p-6 text-center hover:border-indigo-200 dark:hover:border-indigo-800/50 transition-all shadow-sm">
-      <div className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-200 tabular-nums">
-        {count}{suffix}
-      </div>
-      <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-500 mt-1">
-        {label}
-      </div>
-    </div>
-  );
-};
-
 export default function App() {
   const [currentView, setCurrentView] = useState<
     "home" | "exams" | "about" | "more-exams" | "portfolio" | "university"
@@ -189,15 +155,6 @@ export default function App() {
     { id: "difficulty-asc", label: "Easiest" },
   ];
 
-  const stats = useMemo(() => {
-    const uniqueCategories = new Set(mockArchives.map(a => a.category)).size;
-    return {
-      exams: mockArchives.length,
-      categories: uniqueCategories,
-      universities: 3,
-    };
-  }, []);
-
   const filteredArchives = mockArchives
     .filter((item) => {
       const matchesSearch =
@@ -231,17 +188,17 @@ export default function App() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="bg-neutral-900 dark:bg-neutral-800 text-white dark:text-neutral-300 p-2 rounded-lg transition-colors">
-                <Library size={24} />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                <img src="https://cdn.discordapp.com/attachments/1455582752484229140/1506688504866930918/image.png?ex=6a0f2c84&is=6a0ddb04&hm=053e95d76d2f01b0c77bd120a34d5bdd72892d8c364d462e937140bdf446356e&" alt="Profile" className="w-full h-full object-cover" /> 
               </div>
-              <div>
-                <h1 className="font-semibold text-lg leading-tight tracking-tight text-neutral-900 dark:text-neutral-300 transition-colors">
-                  uunknown
+              <div className="flex flex-col">
+                <h1 className="font-bold text-2xl leading-none text-neutral-900 dark:text-neutral-100 transition-colors">
+                  Oripius
                 </h1>
-                <p className="text-[10px] font-mono text-neutral-500 dark:text-neutral-500 uppercase tracking-widest transition-colors">
-                  Exam Archive
+                <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 transition-colors mt-0.5">
+                  Hope and Dream
                 </p>
               </div>
             </div>
@@ -249,58 +206,58 @@ export default function App() {
             <div className="hidden sm:flex items-center gap-4">
               <button
                 onClick={() => setCurrentView("home")}
-                className={`text-sm font-medium transition-colors ${currentView === "home" ? "text-neutral-900 dark:text-neutral-300" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300"}`}
+                className={`text-sm font-bold transition-colors ${currentView === "home" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 Home
               </button>
               <button
                 onClick={() => setCurrentView("exams")}
-                className={`text-sm font-medium transition-colors ${currentView === "exams" ? "text-neutral-900 dark:text-neutral-300" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300"}`}
+                className={`text-sm font-bold transition-colors ${currentView === "exams" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 Exams
               </button>
               <button
                 onClick={() => setCurrentView("portfolio")}
-                className={`text-sm font-medium transition-colors ${currentView === "portfolio" ? "text-neutral-900 dark:text-neutral-300" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300"}`}
+                className={`text-sm font-bold transition-colors ${currentView === "portfolio" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 Portfolio
               </button>
               <button
                 onClick={() => setCurrentView("university")}
-                className={`text-sm font-medium transition-colors ${currentView === "university" ? "text-neutral-900 dark:text-neutral-300" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300"}`}
+                className={`text-sm font-bold transition-colors ${currentView === "university" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 University
               </button>
               <button
                 onClick={() => setCurrentView("about")}
-                className={`text-sm font-medium transition-colors ${currentView === "about" ? "text-neutral-900 dark:text-neutral-300" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300"}`}
+                className={`text-sm font-bold transition-colors ${currentView === "about" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 About Me
               </button>
+              <div className="w-px h-6 bg-neutral-200 dark:bg-neutral-800 mx-2" />
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 ml-2"
+                className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 aria-label="Toggle dark mode"
               >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             </div>
 
-            {/* Mobile Nav Toggle */}
             <div className="flex sm:hidden items-center gap-2">
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 aria-label="Toggle dark mode"
               >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
               </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                <MoreVertical size={28} />
               </button>
             </div>
           </div>
@@ -377,30 +334,17 @@ export default function App() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="py-8 flex flex-col items-center justify-start min-h-[70vh] max-w-5xl mx-auto w-full gap-12 relative overflow-hidden"
+              className="py-12 flex flex-col items-center justify-start min-h-[70vh] max-w-5xl mx-auto w-full gap-12"
             >
-              {/* Decorative background blobs */}
-              <div className="absolute top-20 -left-32 w-96 h-96 bg-indigo-400/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-40 -right-32 w-80 h-80 bg-violet-400/10 dark:bg-violet-500/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-fuchsia-400/5 dark:bg-fuchsia-500/5 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Hero Image Slider */}
-              <div className="w-full px-4 sm:px-0 relative z-10">
-                <ImageSlider />
-              </div>
-
               {/* Text Section */}
-              <div className="text-center px-4 max-w-3xl flex flex-col items-center gap-6 relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50 rounded-full text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                  <LayoutGrid size={12} />
-                  คลังข้อสอบและผลงานคุณภาพ
-                </div>
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-                  <span className="text-neutral-900 dark:text-neutral-200">ยินดีต้อนรับสู่</span>
-                  <br />
-                  <span className="text-gradient">Exam Archive</span>
+              <div className="text-center px-4 max-w-3xl flex flex-col items-center gap-6">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight transition-colors text-neutral-900 dark:text-white whitespace-nowrap">
+                  ยินดีต้อนรับสู่{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-800 dark:from-white via-red-500 to-red-600 drop-shadow-md">
+                    Exam Archive
+                  </span>
                 </h2>
-                <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl leading-relaxed">
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl transition-colors">
                   ค้นหาและดาวน์โหลดข้อสอบเก่า โครงงานวิทยาศาสตร์
                   และผลงานที่น่าสนใจ
                   เพื่อเตรียมความพร้อมและแรงบันดาลใจในการเรียน
@@ -408,61 +352,66 @@ export default function App() {
                 <div className="flex flex-wrap gap-4 justify-center mt-2">
                   <button
                     onClick={() => setCurrentView("exams")}
-                    className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-violet-700 dark:hover:from-indigo-600 dark:hover:to-violet-600 transition-all shadow-lg shadow-indigo-500/25 dark:shadow-indigo-500/20 active:scale-95"
+                    className="px-8 py-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-900/20 active:scale-95"
                   >
                     เริ่มค้นหาข้อสอบ
                   </button>
                   <button
                     onClick={() => setCurrentView("portfolio")}
-                    className="px-8 py-4 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-800 rounded-xl font-medium hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all active:scale-95"
+                    className="px-8 py-4 bg-transparent text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors shadow-sm active:scale-95"
                   >
                     ดูผลงาน Portfolio
                   </button>
                 </div>
               </div>
 
-              {/* Stats Section */}
-              <div className="relative z-10 w-full px-4 sm:px-0 max-w-3xl mx-auto">
-                <div className="grid grid-cols-3 gap-4">
-                  <StatCard label="ข้อสอบ" value={stats.exams} suffix="+" />
-                  <StatCard label="วิชา" value={stats.categories} suffix="" />
-                  <StatCard label="มหาวิทยาลัย" value={stats.universities} suffix="" />
-                </div>
+              {/* Hero Image Slider */}
+              <div className="w-full px-4 sm:px-0">
+                <ImageSlider />
               </div>
 
-              {/* Features Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full px-4 sm:px-0 max-w-4xl mx-auto relative z-10">
-                <div className="group bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800/60 p-6 rounded-2xl shadow-sm text-center flex flex-col items-center gap-4 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-lg hover:shadow-indigo-500/5 transition-all">
-                  <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-indigo-500/20 transition-all">
-                    <Library size={28} />
-                  </div>
-                  <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-200">
-                    คลังข้อสอบ
+              {/* Feature Descriptions */}
+              <div className="w-full max-w-4xl mx-auto px-4 sm:px-0 flex flex-col gap-12 mt-8 text-left">
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-neutral-900 dark:via-white to-neutral-400 drop-shadow-sm">
+                    Exams (คลังข้อสอบ)
                   </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    รวมข้อสอบเก่า สอวน. และ TCAS ให้ครบถ้วน
+                  <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed mb-2">
+                    รวบรวมข้อสอบเก่าจากหลากหลายสนามสอบ ไม่ว่าจะเป็น สอวน. TCAS A-Level และข้อสอบเข้ามหาวิทยาลัยชั้นนำต่างๆ เพื่อเป็นแหล่งความรู้อันมีค่าและช่วยให้ผู้เรียนได้ฝึกฝน ทบทวนความรู้ เพื่อเตรียมความพร้อมสำหรับการสอบอย่างมีประสิทธิภาพสูงสุด
                   </p>
-                </div>
-                <div className="group bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800/60 p-6 rounded-2xl shadow-sm text-center flex flex-col items-center gap-4 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg hover:shadow-violet-500/5 transition-all">
-                  <div className="w-14 h-14 bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-violet-500/20 transition-all">
-                    <FlaskConical size={28} />
+                  
+                  {/* Infinite Scroll Carousel */}
+                  <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-gradient-to-b from-neutral-100 dark:from-black via-white dark:via-neutral-900 to-neutral-100 dark:to-black py-4 sm:py-6 mt-6 border-y border-red-200 dark:border-red-900/30 flex items-center justify-center">
+                    <div className="w-full max-w-7xl inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_40px,_black_calc(100%-40px),transparent_100%)] sm:[mask-image:_linear-gradient(to_right,transparent_0,_black_80px,_black_calc(100%-80px),transparent_100%)]">
+                      <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 sm:[&_li]:mx-8 [&_li]:text-xs sm:[&_li]:text-base [&_li]:font-black [&_li]:text-transparent [&_li]:bg-clip-text [&_li]:bg-gradient-to-r [&_li]:from-neutral-900 dark:[&_li]:from-white [&_li]:via-red-500 [&_li]:to-neutral-500 [&_li]:whitespace-nowrap [&_li]:tracking-widest animate-infinite-scroll w-max drop-shadow-md">
+                      <li>POSN</li>
+                      <li>TCAS</li>
+                      <li>NETSAT</li>
+                      <li>A-LEVEL</li>
+                      <li>TGAT</li>
+                      <li>TPAT</li>
+                      <li>สอวน.</li>
+                      <li>IJSO</li>
+                      {/* Duplicated for seamless looping */}
+                      <li aria-hidden="true">POSN</li>
+                      <li aria-hidden="true">TCAS</li>
+                      <li aria-hidden="true">NETSAT</li>
+                      <li aria-hidden="true">A-LEVEL</li>
+                      <li aria-hidden="true">TGAT</li>
+                      <li aria-hidden="true">TPAT</li>
+                      <li aria-hidden="true">สอวน.</li>
+                      <li aria-hidden="true">IJSO</li>
+                    </ul>
                   </div>
-                  <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-200">
-                    ผลงานและโครงงาน
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    เรียนรู้ไอเดียโครงงานวิทยาศาสตร์และวิศวกรรม
-                  </p>
-                </div>
-                <div className="group bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800/60 p-6 rounded-2xl shadow-sm text-center flex flex-col items-center gap-4 hover:border-fuchsia-300 dark:hover:border-fuchsia-700 hover:shadow-lg hover:shadow-fuchsia-500/5 transition-all">
-                  <div className="w-14 h-14 bg-fuchsia-50 dark:bg-fuchsia-950/30 text-fuchsia-600 dark:text-fuchsia-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-fuchsia-500/20 transition-all">
-                    <BookOpen size={28} />
                   </div>
-                  <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-200">
-                    ข้อมูลมหาวิทยาลัย
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-neutral-900 dark:via-white to-neutral-400 drop-shadow-sm">
+                    Portfolio & University (แฟ้มสะสมผลงานและมหาวิทยาลัย)
                   </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    ดูข้อมูลการรับเข้าและคะแนนของมหาวิทยาลัยต่างๆ
+                  <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed">
+                    พื้นที่จัดเก็บและนำเสนอผลงาน กิจกรรม และโครงงานวิทยาศาสตร์ต่างๆ ของนักเรียน เพื่อแบ่งปันไอเดีย ความสำเร็จ เป็นแนวทางในการจัดทำแฟ้มสะสมผลงาน พร้อมทั้งข้อมูล เเละรายละเอียดของคณะและมหาวิทยาลัยต่างๆ เพื่อสร้างแรงบันดาลใจในการศึกษาต่อ ช่วยประกอบการตัดสินใจ และเตรียมความพร้อมเพื่อก้าวเข้าสู่รั้วมหาวิทยาลัยในฝันอย่างมั่นใจ
                   </p>
                 </div>
               </div>

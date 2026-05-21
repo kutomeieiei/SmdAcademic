@@ -1,43 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 font-sans antialiased selection:bg-neutral-900 selection:text-white dark:bg-neutral-950 dark:text-neutral-300 dark:selection:bg-neutral-300 dark:selection:text-neutral-900;
-  }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-}
-
-@layer utilities {
-  .text-gradient {
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-    background-size: 200% 200%;
-    animation: gradient-shift 6s ease infinite;
-  }
-
-  .dark .text-gradient {
-    background-image: linear-gradient(135deg, #818cf8, #a78bfa, #f472b6);
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased overflow-x-hidden selection:bg-red-500 selection:text-white dark:bg-neutral-950 dark:text-neutral-300 dark:selection:bg-red-500 dark:selection:text-white;
   }
 }
 
@@ -49,4 +22,13 @@
   ::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
+}
+
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 20s linear infinite;
 }
