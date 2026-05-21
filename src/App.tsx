@@ -19,8 +19,6 @@ import {
   ChevronDown,
   ExternalLink,
   ArrowLeft,
-  Sun,
-  Moon,
   MoreVertical,
   Mic,
 } from "lucide-react";
@@ -116,72 +114,56 @@ export default function App() {
   >("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<
-    ArchiveCategory | "All"
-  >("All");
-  const [sortBy, setSortBy] = useState<
-    "default" | "year-desc" | "year-asc" | "difficulty-desc" | "difficulty-asc"
-  >("default");
-  const [showDifficulty, setShowDifficulty] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof document !== "undefined") {
-      return document.documentElement.classList.contains("dark");
-    }
-    return false;
-  });
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [sourceType, setSourceType] = useState<"All" | "Official" | "Unofficial">("All");
+  const [selectedExamType, setSelectedExamType] = useState<string>("All");
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
-  const categories: (ArchiveCategory | "All")[] = [
+  const categories = [
     "All",
-    "Mathematics",
-    "Biology",
-    "Chemistry",
-    "Physics",
+    "รวมทุกวิชา",
+    "คณิตศาสตร์",
+    "ฟิสิกส์",
+    "เคมี",
+    "ชีววิทยา",
   ];
 
-  const sortOptions = [
-    { id: "default", label: "เรียงปกติ" },
-    { id: "year-desc", label: "Newest" },
-    { id: "year-asc", label: "Oldest" },
-    { id: "difficulty-desc", label: "Hardest" },
-    { id: "difficulty-asc", label: "Easiest" },
+  const examTypes = [
+    "All",
+    "สอวน. (POSN)",
+    "TCAS / A-Level",
+    "อื่น ๆ",
   ];
 
-  const filteredArchives = mockArchives
-    .filter((item) => {
-      const matchesSearch =
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
-      const matchesCategory =
-        selectedCategory === "All" || item.category === selectedCategory;
+  const filteredExternalLinks = externalLinks.filter((link) => {
+    const matchesSearch =
+      link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (link.subjects &&
+        link.subjects.some((sub) =>
+          sub.toLowerCase().includes(searchTerm.toLowerCase()),
+        ));
+    const matchesCategory =
+      selectedCategory === "All" ||
+      (link.subjects && link.subjects.includes(selectedCategory));
+    
+    let matchesSource = true;
+    if (sourceType === "Official") {
+      matchesSource = link.isOfficialSource === true;
+    } else if (sourceType === "Unofficial") {
+      matchesSource = link.isOfficialSource !== true;
+    }
 
-      return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "year-desc":
-          return b.yearPublished - a.yearPublished;
-        case "year-asc":
-          return a.yearPublished - b.yearPublished;
-        case "difficulty-desc":
-          return b.difficulty - a.difficulty;
-        case "difficulty-asc":
-          return a.difficulty - b.difficulty;
-        default:
-          return 0;
+    let matchesExamType = true;
+    if (selectedExamType !== "All") {
+      if (selectedExamType === "อื่น ๆ") {
+        matchesExamType = !link.examTypes || link.examTypes.every(et => et !== "สอวน. (POSN)" && et !== "TCAS / A-Level");
+      } else {
+        matchesExamType = link.examTypes ? link.examTypes.includes(selectedExamType) : false;
       }
-    });
+    }
+
+    return matchesSearch && matchesCategory && matchesSource && matchesExamType;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -234,24 +216,9 @@ export default function App() {
               >
                 About Me
               </button>
-              <div className="w-px h-6 bg-neutral-200 dark:bg-neutral-800 mx-2" />
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                aria-label="Toggle dark mode"
-              >
-                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
             </div>
 
             <div className="flex sm:hidden items-center gap-2">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                aria-label="Toggle dark mode"
-              >
-                {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
-              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -334,7 +301,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="py-12 flex flex-col items-center justify-start min-h-[70vh] max-w-5xl mx-auto w-full gap-12"
+              className="py-6 sm:py-12 flex flex-col items-center justify-start min-h-[70vh] max-w-5xl mx-auto w-full gap-6 sm:gap-12"
             >
               {/* Text Section */}
               <div className="text-center px-4 max-w-3xl flex flex-col items-center gap-6">
@@ -349,20 +316,6 @@ export default function App() {
                   และผลงานที่น่าสนใจ
                   เพื่อเตรียมความพร้อมและแรงบันดาลใจในการเรียน
                 </p>
-                <div className="flex flex-wrap gap-4 justify-center mt-2">
-                  <button
-                    onClick={() => setCurrentView("exams")}
-                    className="px-8 py-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-900/20 active:scale-95"
-                  >
-                    เริ่มค้นหาข้อสอบ
-                  </button>
-                  <button
-                    onClick={() => setCurrentView("portfolio")}
-                    className="px-8 py-4 bg-transparent text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors shadow-sm active:scale-95"
-                  >
-                    ดูผลงาน Portfolio
-                  </button>
-                </div>
               </div>
 
               {/* Hero Image Slider */}
@@ -371,7 +324,7 @@ export default function App() {
               </div>
 
               {/* Feature Descriptions */}
-              <div className="w-full max-w-4xl mx-auto px-4 sm:px-0 flex flex-col gap-12 mt-8 text-left">
+              <div className="w-full max-w-4xl mx-auto px-4 sm:px-0 flex flex-col gap-8 sm:gap-12 mt-2 sm:mt-8 text-left">
                 <div className="flex flex-col gap-3">
                   <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-neutral-900 dark:via-white to-neutral-400 drop-shadow-sm">
                     Exams (คลังข้อสอบ)
@@ -379,6 +332,12 @@ export default function App() {
                   <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed mb-2">
                     รวบรวมข้อสอบเก่าจากหลากหลายสนามสอบ ไม่ว่าจะเป็น สอวน. TCAS A-Level และข้อสอบเข้ามหาวิทยาลัยชั้นนำต่างๆ เพื่อเป็นแหล่งความรู้อันมีค่าและช่วยให้ผู้เรียนได้ฝึกฝน ทบทวนความรู้ เพื่อเตรียมความพร้อมสำหรับการสอบอย่างมีประสิทธิภาพสูงสุด
                   </p>
+                  <button
+                    onClick={() => setCurrentView("exams")}
+                    className="mt-2 w-fit px-8 py-3 bg-transparent text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors shadow-sm active:scale-95"
+                  >
+                    เริ่มค้นหาข้อสอบ
+                  </button>
                   
                   {/* Infinite Scroll Carousel */}
                   <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-gradient-to-b from-neutral-100 dark:from-black via-white dark:via-neutral-900 to-neutral-100 dark:to-black py-4 sm:py-6 mt-6 border-y border-red-200 dark:border-red-900/30 flex items-center justify-center">
@@ -413,6 +372,12 @@ export default function App() {
                   <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed">
                     พื้นที่จัดเก็บและนำเสนอผลงาน กิจกรรม และโครงงานวิทยาศาสตร์ต่างๆ ของนักเรียน เพื่อแบ่งปันไอเดีย ความสำเร็จ เป็นแนวทางในการจัดทำแฟ้มสะสมผลงาน พร้อมทั้งข้อมูล เเละรายละเอียดของคณะและมหาวิทยาลัยต่างๆ เพื่อสร้างแรงบันดาลใจในการศึกษาต่อ ช่วยประกอบการตัดสินใจ และเตรียมความพร้อมเพื่อก้าวเข้าสู่รั้วมหาวิทยาลัยในฝันอย่างมั่นใจ
                   </p>
+                  <button
+                    onClick={() => setCurrentView("portfolio")}
+                    className="mt-2 w-fit px-8 py-3 bg-transparent text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors shadow-sm active:scale-95"
+                  >
+                    ดูผลงาน Portfolio
+                  </button>
                 </div>
               </div>
             </motion.section>
@@ -427,28 +392,28 @@ export default function App() {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="max-w-3xl mx-auto py-12 px-4 sm:px-0 flex flex-col gap-8 w-full"
             >
-              <h2 className="text-3xl font-semibold text-neutral-900 dark:text-neutral-300 tracking-tight transition-colors">
-                About Me
-              </h2>
-              <div className="prose prose-neutral dark:prose-invert max-w-none text-neutral-700 dark:text-neutral-400 transition-colors">
-                <p className="text-lg">ok doraymifasol</p>
-                <div className="my-8 flex gap-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400&q=80"
-                    alt="Library"
-                    className="rounded-xl w-1/2 object-cover"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80"
-                    alt="Books"
-                    className="rounded-xl w-1/2 object-cover"
-                  />
-                </div>
-                <h3>Mission</h3>
-                <p>skibidi skibidi</p>
-                <h3>Contact</h3>
-                <p>tornado tornado</p>
-              </div>
+               <h2 className="text-3xl font-semibold text-neutral-900 dark:text-neutral-300 tracking-tight transition-colors">
+                 About Me
+               </h2>
+               <div className="prose prose-neutral dark:prose-invert max-w-none text-neutral-700 dark:text-neutral-400 transition-colors">
+                 <p className="text-lg">ok doraymifasol</p>
+                 <div className="my-8 flex gap-4">
+                   <img
+                     src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400&q=80"
+                     alt="Library"
+                     className="rounded-xl w-1/2 object-cover"
+                   />
+                   <img
+                     src="https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80"
+                     alt="Books"
+                     className="rounded-xl w-1/2 object-cover"
+                   />
+                 </div>
+                 <h3>Mission</h3>
+                 <p>skibidi skibidi</p>
+                 <h3>Contact</h3>
+                 <p>tornado tornado</p>
+               </div>
             </motion.section>
           )}
 
@@ -459,158 +424,225 @@ export default function App() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex flex-col gap-8 w-full"
+              className="flex flex-col gap-8 w-full max-w-4xl mx-auto py-8 relative"
             >
-              {/* Controls */}
-              <section className="flex flex-col sm:flex-row justify-between gap-4">
-                <div className="flex gap-2 bg-neutral-200/50 dark:bg-neutral-900 p-1 rounded-lg w-full sm:w-auto overflow-x-auto transition-colors">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`relative px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                        selectedCategory === cat
-                          ? "text-neutral-900 dark:text-neutral-200"
-                          : "text-neutral-600 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
-                      }`}
-                    >
-                      {selectedCategory === cat && (
-                        <motion.div
-                          layoutId="active-category"
-                          className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-md shadow-sm"
-                          transition={{
-                            type: "spring",
-                            bounce: 0.2,
-                            duration: 0.6,
-                          }}
-                        />
-                      )}
-                      <span className="relative z-10">{cat}</span>
-                    </button>
-                  ))}
-                </div>
-              </section>
+              {/* Background Ambient Glows */}
+              <div className="absolute -top-16 -left-16 w-80 h-80 bg-gradient-to-tr from-red-500/10 via-rose-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute top-1/2 -right-16 w-80 h-80 bg-gradient-to-br from-amber-500/5 via-orange-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-              {/* Search */}
-              <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                <div className="relative group flex-1">
-                  <Search
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-600 group-focus-within:text-neutral-900 dark:group-focus-within:text-neutral-400 transition-colors"
-                    size={20}
-                  />
-                  <input
-                    type="text"
-                    placeholder="ค้นหาข้อสอบโดยพิมพ์ ชื่อ, tag, ฯลฯ"
-                    className="w-full bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-4 text-neutral-900 dark:text-neutral-300 placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-700 focus:border-transparent transition-all shadow-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <button
-                  onClick={() => setCurrentView("more-exams")}
-                  className="px-4 py-2 text-sm bg-neutral-900 dark:bg-neutral-800 text-white dark:text-neutral-300 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0 active:scale-95"
-                >
-                  ข้อสอบเพิ่มเติม
-                </button>
+              {/* Title Section matching Home View */}
+              <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-4 mb-4 relative z-10">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight transition-colors text-neutral-900 dark:text-white">
+                  ค้นหา{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-500 to-amber-500 dark:from-red-400 dark:via-rose-400 dark:to-orange-400 drop-shadow-md">
+                    แหล่งข้อสอบเก่า
+                  </span>
+                </h2>
+                <p className="text-md text-neutral-600 dark:text-neutral-400 max-w-xl transition-colors">
+                  รวบรวมช่องทางดาวน์โหลดและติวข้อสอบจากผู้ออกข้อสอบจริงและแหล่งแนวข้อสอบชั้นนำ เพื่อการเตรียมความพร้อมอย่างไร้ขีดจำกัด
+                </p>
               </div>
 
-              {/* Archive Grid/List */}
-              <section className="pb-24">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4 transition-colors">
-                  <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-300 transition-colors">
-                    ผลลัพธ์ ({filteredArchives.length} รายการ)
-                  </h3>
-
-                  <div className="flex flex-wrap gap-4 items-center">
-                    <label className="flex items-center gap-2 text-sm font-medium text-neutral-600 dark:text-neutral-500 cursor-pointer select-none transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={showDifficulty}
-                        onChange={(e) => setShowDifficulty(e.target.checked)}
-                        className="rounded border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-400 focus:ring-neutral-900 dark:focus:ring-neutral-600 w-4 h-4 cursor-pointer"
-                      />
-                      เเสดงความยาก
-                    </label>
-                    <div className="relative w-full sm:w-auto">
+              {/* Controls & Filters with Custom gradient border highlight */}
+              <section className="flex flex-col gap-5 bg-white/80 dark:bg-neutral-900/60 backdrop-blur-md p-6 rounded-2xl border-t-2 border-t-red-500 border-x border-b border-neutral-200/60 dark:border-neutral-800/60 shadow-lg shadow-neutral-100/10 dark:shadow-none transition-colors relative z-10">
+                {/* 1. Category Filter */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ml-1">
+                    วิชา / หมวดหมู่
+                  </span>
+                  <div className="flex gap-2 p-1 bg-neutral-200/40 dark:bg-neutral-900/80 rounded-xl w-full overflow-x-auto transition-colors scrollbar-none">
+                    {categories.map((cat) => (
                       <button
-                        type="button"
-                        onClick={() => setIsSortOpen(!isSortOpen)}
-                        className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-700 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-700 flex items-center justify-between gap-2 w-full sm:w-36 px-3 py-2 shadow-sm font-medium transition-all"
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                          selectedCategory === cat
+                            ? "text-white"
+                            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                        }`}
                       >
-                        <span>
-                          {sortOptions.find((o) => o.id === sortBy)?.label ||
-                            "เรียงปกติ"}
-                        </span>
-                        <ChevronDown
-                          size={16}
-                          className={`transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}
-                        />
-                      </button>
-
-                      <AnimatePresence>
-                        {isSortOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setIsSortOpen(false)}
-                            />
-                            <motion.div
-                              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute right-0 mt-2 w-full sm:w-48 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg z-20 py-1.5 overflow-hidden origin-top-right transition-colors"
-                            >
-                              {sortOptions.map((option) => (
-                                <button
-                                  key={option.id}
-                                  onClick={() => {
-                                    setSortBy(option.id as any);
-                                    setIsSortOpen(false);
-                                  }}
-                                  className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                                    sortBy === option.id
-                                      ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-300 font-medium"
-                                      : "text-neutral-600 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-300"
-                                  }`}
-                                >
-                                  {option.label}
-                                </button>
-                              ))}
-                            </motion.div>
-                          </>
+                        {selectedCategory === cat && (
+                          <motion.div
+                            layoutId="active-category"
+                            className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg shadow-sm"
+                            transition={{
+                              type: "spring",
+                              bounce: 0.2,
+                              duration: 0.6,
+                            }}
+                          />
                         )}
-                      </AnimatePresence>
+                        <span className="relative z-10">{cat}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Exam Type & Source Type Filter Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Exam Type Filter */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ml-1">
+                      สนามสอบ
+                    </span>
+                    <div className="flex gap-2 p-1 bg-neutral-200/40 dark:bg-neutral-900/80 rounded-xl overflow-x-auto transition-colors scrollbar-none">
+                      {examTypes.map((et) => (
+                        <button
+                          key={et}
+                          onClick={() => setSelectedExamType(et)}
+                          className={`relative flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
+                            selectedExamType === et
+                              ? "text-white"
+                              : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                          }`}
+                        >
+                          {selectedExamType === et && (
+                            <motion.div
+                              layoutId="active-exam-type"
+                              className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg shadow-sm"
+                              transition={{
+                                type: "spring",
+                                bounce: 0.2,
+                                duration: 0.6,
+                              }}
+                            />
+                          )}
+                          <span className="relative z-10">{et}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Source Type Filter */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ml-1">
+                      ผู้จัดทำ / แหล่งที่มา
+                    </span>
+                    <div className="flex bg-neutral-200/45 dark:bg-neutral-900/80 p-1 rounded-xl transition-colors relative">
+                      <button
+                        onClick={() => setSourceType("All")}
+                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
+                          sourceType === "All"
+                            ? "text-white"
+                            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                        }`}
+                      >
+                        {sourceType === "All" && (
+                          <motion.div
+                            layoutId="active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg shadow-sm"
+                            transition={{
+                              type: "spring",
+                              bounce: 0.2,
+                              duration: 0.6,
+                            }}
+                          />
+                        )}
+                        <span className="relative z-10">ทั้งหมด</span>
+                      </button>
+                      <button
+                        onClick={() => setSourceType("Official")}
+                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
+                          sourceType === "Official"
+                            ? "text-white"
+                            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                        }`}
+                      >
+                        {sourceType === "Official" && (
+                          <motion.div
+                            layoutId="active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg shadow-sm"
+                            transition={{
+                              type: "spring",
+                              bounce: 0.2,
+                              duration: 0.6,
+                            }}
+                          />
+                        )}
+                        <span className="relative z-10">ผู้ออกข้อสอบ</span>
+                      </button>
+                      <button
+                        onClick={() => setSourceType("Unofficial")}
+                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
+                          sourceType === "Unofficial"
+                            ? "text-white"
+                            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                        }`}
+                      >
+                        {sourceType === "Unofficial" && (
+                          <motion.div
+                            layoutId="active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg shadow-sm"
+                            transition={{
+                              type: "spring",
+                              bounce: 0.2,
+                              duration: 0.6,
+                            }}
+                          />
+                        )}
+                        <span className="relative z-10">รวบรวม</span>
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {filteredArchives.length === 0 ? (
-                  <div className="text-center py-24 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 text-neutral-500 dark:text-neutral-500 transition-colors">
+                {/* 3. Search Bar */}
+                <div className="flex flex-col gap-2 border-t border-neutral-200/40 dark:border-neutral-800/50 pt-3">
+                  <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ml-1">
+                    ค้นหาอย่างละเอียด
+                  </span>
+                  <div className="relative group w-full">
+                    <Search
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-600 group-focus-within:text-red-500 dark:group-focus-within:text-red-400 transition-colors"
+                      size={20}
+                    />
+                    <input
+                      type="text"
+                      placeholder="ค้นหาแหล่งข้อสอบโดยพิมพ์ ชื่อรายชื่อ, รายวิชา..."
+                      className="w-full bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-4 text-neutral-900 dark:text-neutral-300 placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-500/50 dark:focus:ring-red-600/50 focus:border-transparent transition-all shadow-sm"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Archive Grid/List */}
+              <section className="pb-24 relative z-10">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4 transition-colors">
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-300 transition-colors flex items-center gap-2">
+                    แหล่งข้อสอบเก่า ({filteredExternalLinks.length} รายการ)
+                  </h3>
+                </div>
+
+                {filteredExternalLinks.length === 0 ? (
+                  <div className="text-center py-24 bg-white/50 dark:bg-neutral-950/50 backdrop-blur-sm border border-neutral-200 dark:border-neutral-800 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 text-neutral-500 dark:text-neutral-500 transition-colors">
                     <Search
                       size={48}
                       className="text-neutral-300 dark:text-neutral-700"
                     />
                     <p className="text-lg">
-                      No archives found matching your criteria.
+                      ไม่พบแหล่งข้อสอบที่ตรงกับคำค้นหา
                     </p>
                     <button
                       onClick={() => {
                         setSearchTerm("");
                         setSelectedCategory("All");
+                        setSourceType("All");
+                        setSelectedExamType("All");
                       }}
-                      className="text-neutral-900 dark:text-neutral-300 font-medium hover:underline focus:outline-none"
+                      className="text-red-500 dark:text-red-400 font-semibold hover:underline focus:outline-none transition-colors"
                     >
-                      Clear filters
+                      ล้างตัวกรองทั้งหมด
                     </button>
                   </div>
                 ) : (
-                  <motion.div layout className="flex flex-col gap-3">
+                  <motion.div layout className="flex flex-col gap-4 w-full">
                     <AnimatePresence mode="popLayout">
-                      {filteredArchives.map((item) => (
+                      {filteredExternalLinks.map((link) => (
                         <motion.div
-                          key={item.id}
-                          layoutId={item.id}
+                          key={link.id}
+                          layoutId={link.id}
                           layout="position"
                           initial={{ opacity: 0, y: 15, scale: 0.98 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -629,99 +661,56 @@ export default function App() {
                             y: { type: "spring", bounce: 0, duration: 0.4 },
                             scale: { duration: 0.2 },
                           }}
-                          className="bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800/50 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-700 transition-colors shadow-sm focus-within:ring-2 focus-within:ring-neutral-900 dark:focus-within:ring-neutral-700 p-4 sm:p-3 flex flex-col sm:flex-row sm:items-center gap-4"
+                          className="w-full bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 rounded-2xl p-5 sm:p-6 shadow-sm hover:border-red-500/40 dark:hover:border-red-600/45 hover:shadow-lg hover:shadow-red-500/5 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-4 text-left group"
                         >
-                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <div className="shrink-0 sm:block">
-                              <div className="sm:hidden mt-0.5">
-                                <TypeIcon type={item.type} size={40} />
-                              </div>
-                              <div className="hidden sm:block">
-                                <TypeIcon type={item.type} size={48} />
-                              </div>
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-base sm:text-lg font-medium text-neutral-900 dark:text-neutral-300 leading-snug truncate sm:whitespace-normal line-clamp-2 transition-colors">
-                                  {item.title}
-                                </h4>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 sm:mt-1.5">
-                                <span className="text-[10px] sm:text-xs font-mono text-neutral-500 dark:text-neutral-500 uppercase tracking-wider shrink-0 transition-colors">
-                                  {item.category}
-                                </span>
-                                <div className="flex flex-wrap gap-1.5 shrink-0">
-                                  {item.tags.map((tag) => (
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-200 group-hover:text-red-500 dark:group-hover:text-red-400 line-clamp-1 transition-colors">
+                                {link.title}
+                              </h3>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {link.isOfficialSource ? (
+                                  <span className="text-[10px] font-semibold bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-900/30 px-2 py-0.5 rounded-full whitespace-nowrap transition-colors flex items-center gap-1 uppercase tracking-wider">
+                                    Official
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-semibold bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 dark:border-red-900/30 px-2 py-0.5 rounded-full whitespace-nowrap transition-colors flex items-center gap-1 uppercase tracking-wider">
+                                    รวบรวม
+                                  </span>
+                                )}
+                                {link.examTypes &&
+                                  link.examTypes.map((et) => (
                                     <span
-                                      key={tag}
-                                      className="px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-[10px] font-mono rounded-md border border-neutral-200/60 dark:border-neutral-700/60 transition-colors"
+                                      key={et}
+                                      className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-700/50 px-2.5 py-0.5 rounded-full whitespace-nowrap transition-colors"
                                     >
-                                      #{tag}
+                                      {et}
                                     </span>
                                   ))}
-                                </div>
-                                <div className="hidden sm:block">
-                                  {showDifficulty && (
-                                    <DifficultyBar level={item.difficulty} />
-                                  )}
-                                </div>
+                                {link.subjects &&
+                                  link.subjects.map((sub) => (
+                                    <span
+                                      key={sub}
+                                      className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-400 px-2 py-0.5 rounded-full whitespace-nowrap transition-colors"
+                                    >
+                                      {sub}
+                                    </span>
+                                  ))}
                               </div>
                             </div>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 transition-colors leading-relaxed">
+                              {link.description}
+                            </p>
                           </div>
-
-                          <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 mt-1 sm:mt-0 border-t sm:border-t-0 border-neutral-100 dark:border-neutral-800/50 transition-colors">
-                            <div className="flex items-center gap-2">
-                              {!item.isOfficialSource && (
-                                <div
-                                  className="flex items-center gap-1 text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-md text-[10px] uppercase tracking-wider font-semibold border border-amber-200 dark:border-amber-900/50 shrink-0 transition-colors"
-                                  title="Unofficial Source"
-                                >
-                                  <span>ข้อสอบจากการจำ</span>
-                                </div>
-                              )}
-                              <span className="text-[10px] font-mono text-neutral-500 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800/50 px-2 py-1 rounded-md shrink-0 border border-neutral-200 dark:border-neutral-700/50 transition-colors">
-                                {item.yearPublished}
-                              </span>
-                              <div className="sm:hidden">
-                                {showDifficulty && (
-                                  <DifficultyBar level={item.difficulty} />
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {item.solutionUrl && (
-                                <a
-                                  href={item.solutionUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center justify-center bg-white dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-300 py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer shrink-0"
-                                  title="View Solution"
-                                >
-                                  <span>เฉลย</span>
-                                </a>
-                              )}
-                              {item.downloadUrl ? (
-                                <a
-                                  href={item.downloadUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center justify-center bg-neutral-900 dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700 text-white dark:text-neutral-300 py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer shrink-0"
-                                  title="Download External Link"
-                                >
-                                  <span>Download</span>
-                                </a>
-                              ) : (
-                                <button
-                                  onClick={() => handleMockDownload(item)}
-                                  className="flex items-center justify-center bg-neutral-900 dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700 text-white dark:text-neutral-300 py-2 px-3 sm:px-4 rounded-lg text-sm font-medium transition-colors cursor-pointer shrink-0"
-                                  title="Download Mock"
-                                >
-                                  <span>Download</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-gradient-to-r hover:from-red-500 hover:to-rose-600 text-neutral-900 dark:text-neutral-300 hover:text-white dark:hover:text-white rounded-xl text-sm font-medium transition-all sm:shrink-0 hover:-translate-y-0.5 active:scale-95 border border-neutral-200/50 dark:border-neutral-700/50 hover:border-transparent dark:hover:border-transparent group-hover:shadow-md group-hover:shadow-red-500/10"
+                          >
+                            <span>ไปที่เว็บไซต์</span>
+                            <ExternalLink size={16} />
+                          </a>
                         </motion.div>
                       ))}
                     </AnimatePresence>
@@ -729,77 +718,6 @@ export default function App() {
                 )}
               </section>
             </motion.div>
-          )}
-          {currentView === "more-exams" && (
-            <motion.section
-              key="more-exams"
-              initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="py-12 flex flex-col items-center justify-center min-h-[50vh] w-full gap-8 max-w-3xl mx-auto relative"
-            >
-              <div className="w-full flex justify-start -mt-8 sm:-mt-12">
-                <button
-                  onClick={() => setCurrentView("exams")}
-                  className="px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-300 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg font-medium transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                  <ArrowLeft size={16} />
-                  กลับไปหน้าข้อสอบหลัก
-                </button>
-              </div>
-
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-neutral-900 dark:text-neutral-300 mb-2 transition-colors">
-                  ข้อสอบเพิ่มเติม
-                </h2>
-                <p className="text-neutral-600 dark:text-neutral-500 max-w-xl mx-auto transition-colors">
-                  หน้านี้จะรวมข้อสอบที่มาจากแหล่งอื่นๆ หรือกำลังอยู่ในช่วงรวบรวม
-                </p>
-              </div>
-
-              <div className="w-full flex justify-center">
-                <div className="flex flex-col gap-4 w-full">
-                  {externalLinks.map((link) => (
-                    <div
-                      key={link.id}
-                      className="w-full bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800/50 rounded-2xl p-5 sm:p-6 shadow-sm hover:border-neutral-400 dark:hover:border-neutral-700 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-4 text-left group"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-300 line-clamp-1 transition-colors">
-                            {link.title}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {link.subjects &&
-                              link.subjects.map((sub) => (
-                                <span
-                                  key={sub}
-                                  className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400 px-2 py-0.5 rounded-full whitespace-nowrap transition-colors"
-                                >
-                                  {sub}
-                                </span>
-                              ))}
-                          </div>
-                        </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-500 transition-colors">
-                          {link.description}
-                        </p>
-                      </div>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-300 rounded-xl text-sm font-medium transition-colors sm:shrink-0"
-                      >
-                        <span>ไปที่เว็บไซต์</span>
-                        <ExternalLink size={16} />
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.section>
           )}
 
           {currentView === "portfolio" && (

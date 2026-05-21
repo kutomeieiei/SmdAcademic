@@ -97,18 +97,13 @@ export function ImageSlider() {
                 alt={img.title}
                 className="w-full h-full object-cover"
               />
-              <div className={`absolute inset-0 z-20 flex flex-col items-center justify-end text-center p-6 sm:p-12 transition-opacity duration-500 ${isCenter ? 'opacity-100 delay-300' : 'opacity-0'}`}>
-                <h3 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-3 sm:mb-4 tracking-tight drop-shadow-md">
+              <div className={`absolute inset-0 z-20 flex flex-col items-start justify-end text-left p-6 sm:p-10 transition-opacity duration-500 ${isCenter ? 'opacity-100 delay-300' : 'opacity-0'}`}>
+                <h3 className="text-xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-3 tracking-tight drop-shadow-md">
                   {img.title}
                 </h3>
-                <p className="text-white/90 text-sm sm:text-lg md:text-xl max-w-2xl font-medium drop-shadow-sm">
+                <p className="text-white/90 text-xs sm:text-sm md:text-lg max-w-[90%] sm:max-w-2xl font-medium drop-shadow-sm">
                   {img.subtitle}
                 </p>
-                {isCenter && (
-                  <button className="mt-6 px-6 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white font-semibold transition-all border border-white/30">
-                    Learn more
-                  </button>
-                )}
               </div>
             </div>
           );

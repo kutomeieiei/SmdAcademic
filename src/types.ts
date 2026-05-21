@@ -6,6 +6,8 @@ export interface ExternalLinkItem {
   description: string;
   url: string;
   subjects: string[];
+  isOfficialSource?: boolean;
+  examTypes?: string[];
 }
 
 export interface PortfolioItem {
@@ -17,6 +19,8 @@ export interface PortfolioItem {
 }
 
 export interface ArchiveItem {
+  id?: string;
+  dateAdded?: string;
   title: string;
   description: string;
   category: string;
