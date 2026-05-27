@@ -395,7 +395,7 @@ export default function App() {
                   </button>
                   
                   {/* Infinite Scroll Carousel */}
-                  <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-transparent py-4 sm:py-6 mt-6 border-y border-red-200 dark:border-red-900/30 flex items-center justify-center">
+                  <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-transparent py-4 sm:py-6 mt-6 flex items-center justify-center">
                     <div className="w-full inline-flex flex-nowrap overflow-hidden">
                       <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 sm:[&_li]:mx-8 [&_li]:text-xs sm:[&_li]:text-base [&_li]:font-black [&_li]:text-transparent [&_li]:bg-clip-text [&_li]:bg-gradient-to-r [&_li]:from-neutral-900 dark:[&_li]:from-white [&_li]:via-red-500 [&_li]:to-neutral-500 [&_li]:whitespace-nowrap [&_li]:tracking-widest animate-infinite-scroll w-max drop-shadow-md">
                       <li>POSN</li>
@@ -406,7 +406,23 @@ export default function App() {
                       <li>TPAT</li>
                       <li>สอวน.</li>
                       <li>IJSO</li>
+                      <li>POSN</li>
+                      <li>TCAS</li>
+                      <li>NETSAT</li>
+                      <li>A-LEVEL</li>
+                      <li>TGAT</li>
+                      <li>TPAT</li>
+                      <li>สอวน.</li>
+                      <li>IJSO</li>
                       {/* Duplicated for seamless looping */}
+                      <li aria-hidden="true">POSN</li>
+                      <li aria-hidden="true">TCAS</li>
+                      <li aria-hidden="true">NETSAT</li>
+                      <li aria-hidden="true">A-LEVEL</li>
+                      <li aria-hidden="true">TGAT</li>
+                      <li aria-hidden="true">TPAT</li>
+                      <li aria-hidden="true">สอวน.</li>
+                      <li aria-hidden="true">IJSO</li>
                       <li aria-hidden="true">POSN</li>
                       <li aria-hidden="true">TCAS</li>
                       <li aria-hidden="true">NETSAT</li>
