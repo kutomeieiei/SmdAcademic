@@ -362,8 +362,8 @@ export default function App() {
               <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-neutral-50 dark:bg-[#050505] text-neutral-900 dark:text-white pt-24 pb-8 flex flex-col items-center z-[40]">
                 {/* Ambient Background Glow Container */}
                 <div className="absolute inset-0 overflow-visible pointer-events-none z-[25]">
-                  <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[350px] bg-red-500/10 dark:bg-red-900/15 rounded-full blur-[100px]"></div>
-                  <div className="absolute bottom-[-15%] right-[-15%] w-[45%] h-[350px] bg-rose-500/10 dark:bg-rose-900/15 rounded-full blur-[120px]"></div>
+                  <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[350px] bg-red-500/10 dark:bg-red-900/15 rounded-full blur-[100px] transform-gpu"></div>
+                  <div className="absolute bottom-[-15%] right-[-15%] w-[45%] h-[350px] bg-rose-500/10 dark:bg-rose-900/15 rounded-full blur-[120px] transform-gpu"></div>
                 </div>
 
                 <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-6 relative z-[30] w-full">
@@ -380,10 +380,16 @@ export default function App() {
               </div>
 
               {/* Middle Section */}
-              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-white dark:bg-white shadow-[0_0_60px_20px_rgba(255,255,255,1)] dark:shadow-[0_0_100px_30px_rgba(255,255,255,0.5)] pt-6 pb-4 z-[35] overflow-visible">
+              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-[#faf7f7] dark:bg-[#1e1717] pt-6 pb-4 z-[35] overflow-visible backdrop-blur-sm">
+                
+                {/* Ambient Dark Red Glow Container */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[250px] bg-red-900/10 dark:bg-red-900/30 rounded-full blur-[100px] transform-gpu"></div>
+                </div>
+
                 {/* SVG dripping shape at the top of Middle Section */}
-                <div className="absolute top-0 left-0 w-[100vw] overflow-hidden leading-[0] z-20 drop-shadow-[0_20px_30px_rgba(255,255,255,0.3)] pointer-events-none">
-                  <svg className="block w-full h-[220px] md:h-[440px] fill-neutral-50 dark:fill-[#050505] drop-shadow-md" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <div className="absolute top-0 left-0 w-[100vw] overflow-hidden leading-[0] z-20 pointer-events-none transform-gpu -mt-[1px]">
+                  <svg className="block w-full h-[220px] md:h-[440px] fill-neutral-50 dark:fill-[#050505]" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path d="M0,0 V46.29C39.4,46.29 55.6,90.3 113,90.3 170.4,90.3 186.6,18.4 226,18.4 265.4,18.4 286.7,71.2 339,71.2 391.3,71.2 411.5,12 452,12 492.5,12 506.7,55 565,55 623.3,55 640.7,21 678,21 715.3,21 732.1,80 791,80 849.9,80 862.6,35 904,35 945.4,35 965.7,85 1017,85 1068.3,85 1084.7,26 1130,26 1175.3,26 1186,46.29 1200,46.29V0Z"></path>
                   </svg>
                 </div>
@@ -396,7 +402,7 @@ export default function App() {
 
                 {/* SVG Curve at the bottom of Middle Section */}
                 <div className="absolute top-full left-0 w-[100vw] leading-[0] z-20 pointer-events-none -mt-[1px]">
-                  <svg className="block w-full h-[60px] md:h-[100px] fill-white dark:fill-white" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                  <svg className="block w-full h-[60px] md:h-[100px] fill-[#faf7f7] dark:fill-[#1e1717]" viewBox="0 0 1200 120" preserveAspectRatio="none">
                      <path d="M0,0 Q600,120 1200,0 Z"></path>
                   </svg>
                 </div>
@@ -409,8 +415,8 @@ export default function App() {
               <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-neutral-50 dark:bg-[#050505] text-neutral-900 dark:text-white pt-10 pb-24 mt-auto z-[30] flex flex-col items-center">
                 {/* Ambient Background Glow Container */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                  <div className="absolute top-[10%] left-[-15%] w-[45%] h-[350px] bg-rose-500/10 dark:bg-rose-900/15 rounded-full blur-[110px]"></div>
-                  <div className="absolute bottom-[10%] right-[-10%] w-[50%] h-[350px] bg-red-500/10 dark:bg-red-900/15 rounded-full blur-[100px]"></div>
+                  <div className="absolute top-[10%] left-[-15%] w-[45%] h-[350px] bg-rose-500/10 dark:bg-rose-900/15 rounded-full blur-[110px] transform-gpu"></div>
+                  <div className="absolute bottom-[10%] right-[-10%] w-[50%] h-[350px] bg-red-500/10 dark:bg-red-900/15 rounded-full blur-[100px] transform-gpu"></div>
                 </div>
 
                 <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col gap-12 text-left relative z-10">
