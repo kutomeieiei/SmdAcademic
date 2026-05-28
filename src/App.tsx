@@ -23,11 +23,14 @@ import {
   Mic,
   Copyright,
   Instagram,
+  Image,
+  Upload,
+  Trash2,
+  Sliders,
 } from "lucide-react";
 import { mockArchives } from "./data/mockArchives";
 import { externalLinks } from "./data/externalLinks";
 import { portfolioLinks } from "./data/portfolioLinks";
-import { ImageSlider } from "./components/ImageSlider";
 import { University } from "./components/University";
 import { ArchiveItem, ArchiveCategory } from "./types";
 import { motion, AnimatePresence } from "motion/react";
@@ -109,6 +112,13 @@ const handleMockDownload = (item: ArchiveItem) => {
   element.click();
   document.body.removeChild(element);
 };
+
+// ==========================================
+// 🛠️ ตั้งค่าภาพพื้นหลังส่วนกลาง (Middle Section Background)
+// ก๊อปปี้ลิงก์รูปภาพ (เช่น "https://...") หรือรูปภาพแบบ Base64 มาแปะได้ในตัวแปรด้านล่างนี้ได้เลยครับ!
+// ==========================================
+const MIDDLE_SECTION_BACKGROUND_IMAGE = "https://cdn.discordapp.com/attachments/1455582752484229140/1506688582088392885/image.png?ex=6a190fd6&is=6a17be56&hm=6d191c6ca403f2b530382b576dd0bf911b62a5cc2abf30c3beb91a080df17522&"; // 👈 วางลิงก์รูปตรงชองนี้เพื่อเป็นพื้นหลังส่วนกลาง
+const MIDDLE_SECTION_BACKGROUND_OPACITY = 1; // 👈 ปรับความเข้ม/ความสว่างของภาพพื้นหลัง (ปรับระหว่าง 0.1 - 1.0)
 
 export default function App() {
   const [currentView, setCurrentView] = useState<
@@ -380,24 +390,25 @@ export default function App() {
               </div>
 
               {/* Middle Section */}
-              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-[#faf7f7] dark:bg-[#1e1717] pt-6 pb-4 z-[35] overflow-visible backdrop-blur-sm">
+              <div 
+                className="w-[100vw] relative left-1/2 -translate-x-1/2 pt-6 pb-4 z-[35] overflow-visible backdrop-blur-sm min-h-[160px] md:min-h-[260px] flex flex-col items-center justify-center transition-all duration-500 bg-[#faf7f7] dark:bg-[#1e1717]"
+                style={{
+                  backgroundImage: MIDDLE_SECTION_BACKGROUND_IMAGE ? `url(${MIDDLE_SECTION_BACKGROUND_IMAGE})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                {/* Opacity Overlay to blend the image perfectly with Light/Dark scheme */}
+                {MIDDLE_SECTION_BACKGROUND_IMAGE && (
+                  <div 
+                    className="absolute inset-0 bg-[#faf7f7] dark:bg-[#1e1717] transition-all duration-300 pointer-events-none"
+                    style={{ opacity: 1 - MIDDLE_SECTION_BACKGROUND_OPACITY }}
+                  />
+                )}
                 
                 {/* Ambient Dark Red Glow Container */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[250px] bg-red-900/10 dark:bg-red-900/30 rounded-full blur-[100px] transform-gpu"></div>
-                </div>
-
-                {/* SVG dripping shape at the top of Middle Section */}
-                <div className="absolute top-0 left-0 w-[100vw] overflow-hidden leading-[0] z-20 pointer-events-none transform-gpu -mt-[1px]">
-                  <svg className="block w-full h-[60px] sm:h-[90px] md:h-[140px] lg:h-[180px] fill-neutral-50 dark:fill-[#050505]" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M0,0 V46.29C39.4,46.29 55.6,90.3 113,90.3 170.4,90.3 186.6,18.4 226,18.4 265.4,18.4 286.7,71.2 339,71.2 391.3,71.2 411.5,12 452,12 492.5,12 506.7,55 565,55 623.3,55 640.7,21 678,21 715.3,21 732.1,80 791,80 849.9,80 862.6,35 904,35 945.4,35 965.7,85 1017,85 1068.3,85 1084.7,26 1130,26 1175.3,26 1186,46.29 1200,46.29V0Z"></path>
-                  </svg>
-                </div>
-
-                <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col relative z-30">
-                  <div className="w-full">
-                    <ImageSlider />
-                  </div>
                 </div>
 
                 {/* SVG Curve at the bottom of Middle Section */}
