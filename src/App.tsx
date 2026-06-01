@@ -396,7 +396,7 @@ export default function App() {
                 </h3>
               </div>
 
-              <div className="max-w-2xl w-full text-neutral-600 dark:text-neutral-300 text-lg md:text-xl leading-relaxed flex flex-col gap-6 text-left">
+              <div className="max-w-2xl w-full text-neutral-600 dark:text-neutral-300 text-lg md:text-xl leading-relaxed flex flex-col gap-6 text-left md:text-center">
                 <p>
                   พวกเราพร้อมที่จะช่วยทุกๆคน สำหรับการเตรียมความพร้อม
                   <br className="hidden sm:block" />
@@ -417,7 +417,7 @@ export default function App() {
               <div className="flex flex-col items-start gap-6 mt-8 pt-10 border-t border-neutral-200/50 dark:border-neutral-800/50 w-full text-left">
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white">Contact Us</h3>
                 <div className="w-full text-left text-neutral-600 dark:text-neutral-400">
-                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="#" className="text-red-500 hover:underline font-medium">Feedback</a>
+                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" className="text-red-500 hover:underline font-medium">Feedback</a>
                 </div>
               </div>
             </motion.section>
@@ -913,7 +913,7 @@ export default function App() {
             <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm transition-colors flex items-center gap-2 sm:gap-3">
               <span className="truncate">เว็บไซต์ฝ่ายวิชาการของพรรค Oripius</span>
               <span className="text-neutral-300 dark:text-neutral-700">|</span>
-              <a href="#" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors whitespace-nowrap">
+              <a href="https://forms.gle/hTcHcqe53K5iifR68" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors whitespace-nowrap">
                 Feedback
               </a>
               <span className="text-neutral-300 dark:text-neutral-700">|</span>
