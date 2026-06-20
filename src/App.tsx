@@ -392,7 +392,7 @@ export default function App() {
                   We Are Oripius Academic Team
                 </h2>
                 <h3 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600 drop-shadow-sm mt-2">
-                  by SMD Leadership 44
+                  SMD Leadership 44
                 </h3>
               </div>
 
@@ -409,7 +409,7 @@ export default function App() {
                 </p>
                 <div className="w-full text-center mt-6">
                   <p className="font-semibold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600 relative inline-block">
-                    จุดหมายที่ดูไกล มันจะใกล
+                    จุดหมายที่ดูไกล มันจะใกล้
                   </p>
                 </div>
               </div>
@@ -417,7 +417,7 @@ export default function App() {
               <div className="flex flex-col items-start gap-6 mt-8 pt-10 border-t border-neutral-200/50 dark:border-neutral-800/50 w-full text-left">
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white">Contact Us</h3>
                 <div className="w-full text-left text-neutral-600 dark:text-neutral-400">
-                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" className="text-red-500 hover:underline font-medium">Feedback</a>
+                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="text-red-500 hover:underline font-medium">Feedback</a>
                 </div>
               </div>
             </motion.section>
@@ -642,14 +642,14 @@ export default function App() {
                   </div>
                 ) : (
                   <motion.div layout className="flex flex-col gap-4 w-full">
-                    <AnimatePresence initial={false}>
+                    <AnimatePresence mode="popLayout" initial={false}>
                       {filteredExternalLinks.map((link) => (
                         <motion.div
                           key={link.id}
                           layout="position"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
                           transition={{
                             layout: { type: "spring", bounce: 0, duration: 0.4 },
                             opacity: { duration: 0.2 },
@@ -913,7 +913,7 @@ export default function App() {
             <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm transition-colors flex items-center gap-2 sm:gap-3">
               <span className="truncate">เว็บไซต์ฝ่ายวิชาการของพรรค Oripius</span>
               <span className="text-neutral-300 dark:text-neutral-700">|</span>
-              <a href="https://forms.gle/hTcHcqe53K5iifR68" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors whitespace-nowrap">
+              <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors whitespace-nowrap">
                 Feedback
               </a>
               <span className="text-neutral-300 dark:text-neutral-700">|</span>
