@@ -43,7 +43,7 @@ export const portfolioLinks: PortfolioItem[] = [
     tags: ["Medical", "KKU"],
     ownerName: "พี่ไซเเอม",
     ownerFullName: "นางสาวเจตนิพิฐ ลี่",
-    targetFacultyAndUni: "คณะทันตแพทยศาสตร์ มหาวิทยาลัยขอนแก่น",
+    targetFacultyAndUni: "คณะแพทยศาสตร์ มหาวิทยาลัยขอนแก่น",
     coverImageUrl: "https://drive.google.com/file/d/1Qx1F0MEVGx18DWgwwoovofHt-2Xue-vh/view?usp=drive_link"
   },
   {
