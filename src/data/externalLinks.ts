@@ -16,7 +16,7 @@ export const externalLinks: ExternalLinkItem[] = [
     description: 'รวบรวมข้อสอบคณิตศาสตร์มัธยมปลาย สมาคมคณิตศาสตร์ สอวน. และข้อสอบแข่งขันคณิตศาสตร์ต่างๆ มากมาย',
     url: 'http://www.rathcenter.com/',
     subjects: ['คณิตศาสตร์'],
-    isOfficialSource: false,
+    isOfficialSource: true,
     examTypes: ['สอวน. (POSN)', 'TCAS / A-Level']
   },
   {

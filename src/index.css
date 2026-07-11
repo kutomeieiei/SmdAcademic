@@ -10,7 +10,7 @@
 
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 font-sans antialiased overflow-x-hidden selection:bg-red-600 selection:text-white dark:bg-[#050505] dark:text-neutral-300 dark:selection:bg-red-600 dark:selection:text-white min-h-screen relative;
+    @apply bg-[#f0f2f5] text-neutral-800 font-sans antialiased overflow-x-hidden selection:bg-red-600 selection:text-white dark:bg-[#050505] dark:text-neutral-300 dark:selection:bg-red-600 dark:selection:text-white min-h-screen relative;
   }
 }
 

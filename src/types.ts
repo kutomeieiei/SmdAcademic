@@ -8,6 +8,7 @@ export interface ExternalLinkItem {
   subjects: string[];
   isOfficialSource?: boolean;
   examTypes?: string[];
+  logoUrl?: string;
 }
 
 export interface PortfolioItem {
