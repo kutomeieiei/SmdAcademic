@@ -37,7 +37,7 @@ import {
   Sun,
 } from "lucide-react";
 import oripiusIcon from "./assets/icons/oripius.png";
-import { mathLinks, physicsLinks, chemistryLinks, biologyLinks } from "./data/externalLinks";
+import { mathLinks, physicsLinks, chemistryLinks, biologyLinks, englishLinks } from "./data/externalLinks";
 import { portfolioLinks } from "./data/portfolioLinks";
 import { sourceLinks } from "./data/sourceLinks";
 import { motion, AnimatePresence } from "motion/react";
@@ -71,13 +71,15 @@ function ExamSourceLogo({ logoUrl, title, shortName }: ExamSourceLogoProps) {
 
   if (directLink && !imageError) {
     return (
-      <img
-        src={directLink}
-        alt={title}
-        referrerPolicy="no-referrer"
-        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain bg-white dark:bg-neutral-800 p-1 border border-neutral-200 dark:border-neutral-700 shadow-sm transition-transform duration-300"
-        onError={() => setImageError(true)}
-      />
+      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl p-[1.5px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] shadow-sm transition-transform duration-300">
+        <img
+          src={directLink}
+          alt={title}
+          referrerPolicy="no-referrer"
+          className="w-full h-full rounded-xl object-contain bg-white p-1"
+          onError={() => setImageError(true)}
+        />
+      </div>
     );
   }
 
@@ -92,7 +94,13 @@ function ExamSourceLogo({ logoUrl, title, shortName }: ExamSourceLogoProps) {
 }
 
 export default function App() {
-  const [localExternalLinks, setLocalExternalLinks] = useState<any[]>([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
+  const [localExternalLinks, setLocalExternalLinks] = useState<any[]>([
+    ...mathLinks.map(l => ({ ...l, category: "คณิตศาสตร์" })),
+    ...physicsLinks.map(l => ({ ...l, category: "ฟิสิกส์" })),
+    ...chemistryLinks.map(l => ({ ...l, category: "เคมี" })),
+    ...biologyLinks.map(l => ({ ...l, category: "ชีววิทยา" })),
+    ...englishLinks.map(l => ({ ...l, category: "ภาษาอังกฤษ" }))
+  ]);
 
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<any | null>(null);
@@ -121,6 +129,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sourceType, setSourceType] = useState<"All" | "Official" | "Unofficial">("All");
+  const [selectedSourceFilter, setSelectedSourceFilter] = useState("ทั้งหมด");
   const [selectedExamType, setSelectedExamType] = useState<string>("All");
   const [portfolioSearch, setPortfolioSearch] = useState("");
   const [selectedPortfolioTag, setSelectedPortfolioTag] = useState<string>("All");
@@ -210,59 +219,25 @@ export default function App() {
   ];
 
   const filteredExternalLinks = localExternalLinks.filter((link) => {
-    const matchesSearch =
-      link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (link.subjects &&
-        link.subjects.some((sub) =>
-          sub.toLowerCase().includes(searchTerm.toLowerCase()),
-        ));
-    
-    let matchesSource = true;
-    if (sourceType === "Official") {
-      matchesSource = link.isOfficialSource === true;
-    } else if (sourceType === "Unofficial") {
-      matchesSource = link.isOfficialSource !== true;
-    }
-
-    let matchesExamType = true;
-    if (selectedExamType !== "All") {
-      if (selectedExamType === "อื่น ๆ") {
-        matchesExamType = !link.examTypes || link.examTypes.every(et => et !== "สอวน. (POSN)" && et !== "TCAS / A-Level");
-      } else {
-        matchesExamType = link.examTypes ? link.examTypes.includes(selectedExamType) : false;
-      }
-    }
-
-    return matchesSearch && matchesSource && matchesExamType;
+    return link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           link.description.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const filteredSourceLinks = localSourceLinks.filter((link) => {
-    const matchesSearch =
-      link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (link.subjects &&
-        link.subjects.some((sub) =>
-          sub.toLowerCase().includes(searchTerm.toLowerCase()),
-        ));
+    const matchesSearch = link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           link.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    let matchesSource = true;
-    if (sourceType === "Official") {
-      matchesSource = link.isOfficialSource === true;
-    } else if (sourceType === "Unofficial") {
-      matchesSource = link.isOfficialSource !== true;
+    if (!matchesSearch) return false;
+
+    if (selectedSourceFilter === "ทั้งหมด") return true;
+    if (selectedSourceFilter === "สรุปเนื้อหา") {
+      return link.tags?.some(tag => tag.includes("สรุป"));
+    }
+    if (selectedSourceFilter === "แบบฝึกหัด") {
+      return link.tags?.some(tag => tag.toLowerCase().includes("mock") || tag.includes("จำลอง") || tag.includes("ข้อสอบ") || tag.includes("แบบฝึกหัด"));
     }
 
-    let matchesExamType = true;
-    if (selectedExamType !== "All") {
-      if (selectedExamType === "อื่น ๆ") {
-        matchesExamType = !link.examTypes || link.examTypes.every(et => et !== "สอวน. (POSN)" && et !== "TCAS / A-Level");
-      } else {
-        matchesExamType = link.examTypes ? link.examTypes.includes(selectedExamType) : false;
-      }
-    }
-
-    return matchesSearch && matchesSource && matchesExamType;
+    return true;
   });
 
   return (
@@ -589,8 +564,6 @@ export default function App() {
                 </p>
               </div>
 
-
-
               {/* Subject Accordions */}
               <div className="flex justify-between items-center w-full relative z-10 mb-2 px-1">
                 <span className="text-sm text-neutral-700 dark:text-neutral-400">
@@ -603,12 +576,13 @@ export default function App() {
                   { id: "ฟิสิกส์", name: "ฟิสิกส์", shortName: "Phys" },
                   { id: "เคมี", name: "เคมี", shortName: "Chem" },
                   { id: "ชีววิทยา", name: "ชีววิทยา", shortName: "Bio" },
+                  { id: "ภาษาอังกฤษ", name: "ภาษาอังกฤษ", shortName: "Eng" },
                 ].map((subject) => {
                   const isExpanded = selectedCategory === subject.id;
                   
                   // Filter the already filtered external links specifically for this subject
                   const subjectLinks = filteredExternalLinks.filter(link => 
-                     link.subjects && (link.subjects.includes(subject.id) || link.subjects.includes("รวมทุกวิชา"))
+                     link.category === subject.id || link.category === "รวมทุกวิชา"
                   );
 
                   return (
@@ -621,20 +595,16 @@ export default function App() {
                            {/* Gradient bottom line under subject title */}
                            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]" />
                            <div className="flex items-center gap-4 sm:gap-5">
-
-                            <div className="flex items-center justify-center w-12 sm:w-16">
-                               <span className="font-mono text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-all duration-300 group-hover:scale-110">{subject.shortName}</span>
-                            </div>
-                            <span className="text-xl sm:text-2xl font-bold tracking-wide transition-colors text-neutral-700 dark:text-neutral-100 group-hover:text-[#09D1C7] dark:group-hover:text-[#FF00FF]">
-                              {subject.name}
-                            </span>
-                         </div>
-                         <div className="flex items-center gap-3 sm:gap-4">
-                            <span className="hidden sm:inline-block text-sm font-medium text-neutral-700 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
-                               {subjectLinks.length} แหล่งข้อสอบ
-                            </span>
-                            <ChevronDown className={`w-6 h-6 text-[#09D1C7] dark:text-[#FF00FF] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
-                         </div>
+                              <div className="flex items-center justify-center w-12 sm:w-16">
+                                <span className="font-mono text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-all duration-300 group-hover:scale-110">{subject.shortName}</span>
+                              </div>
+                              <span className="text-xl sm:text-2xl font-bold tracking-wide transition-colors text-neutral-700 dark:text-neutral-100 group-hover:text-[#09D1C7] dark:group-hover:text-[#FF00FF]">
+                                {subject.name}
+                              </span>
+                           </div>
+                           <div className="flex items-center gap-3 sm:gap-4">
+                              <ChevronDown className={`w-6 h-6 text-[#09D1C7] dark:text-[#FF00FF] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                           </div>
                          </div>
                       </button>
 
@@ -653,16 +623,8 @@ export default function App() {
                                     ไม่พบแหล่งข้อสอบที่ค้นหาในหมวดหมู่นี้
                                   </div>
                                ) : (
-                                  <div className="flex flex-col gap-8">
-                                     {subjectLinks.filter(l => l.isOfficialSource).length > 0 && (
-                                       <div className="flex flex-col gap-4">
-                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-                                           <Building2 size={16} className="text-[#09D1C7] dark:text-[#FF00FF]" />
-                                           สนามสอบ
-                                         </h4>
-                                         <div className="flex flex-col gap-4">
-                                           {subjectLinks.filter(l => l.isOfficialSource).map((link) => (
-                                             
+                                  <div className="flex flex-col gap-4">
+                                     {subjectLinks.map((link) => (
                                        <motion.a
                                          href={link.url}
                                          target="_blank"
@@ -677,64 +639,15 @@ export default function App() {
                                             <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={subject.shortName} />
                                           </div>
                                          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
+                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] transition-colors line-clamp-1">
                                              {link.title}
                                            </h3>
                                            <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
                                              {link.description}
                                            </p>
-                                           
-                                         </div>
-                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
-                                           <ExternalLink size={20} />
                                          </div>
                                        </motion.a>
-
-                                           ))}
-                                         </div>
-                                       </div>
-                                     )}
-                                     
-                                     {subjectLinks.filter(l => !l.isOfficialSource).length > 0 && (
-                                       <div className="flex flex-col gap-4">
-                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-                                           <BookOpen size={16} className="text-[#09D1C7] dark:text-[#FF00FF]" />
-                                           แหล่งสอบเพิ่มเติม
-                                         </h4>
-                                         <div className="flex flex-col gap-4">
-                                           {subjectLinks.filter(l => !l.isOfficialSource).map((link) => (
-                                             
-                                       <motion.a
-                                         href={link.url}
-                                         target="_blank"
-                                         rel="noopener noreferrer"
-                                         key={link.id}
-                                         initial={{ opacity: 0, y: 10 }}
-                                         animate={{ opacity: 1, y: 0 }}
-                                         transition={{ duration: 0.3 }}
-                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
-                                       >
-                                         <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
-                                            <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={subject.shortName} />
-                                          </div>
-                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
-                                             {link.title}
-                                           </h3>
-                                           <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
-                                             {link.description}
-                                           </p>
-                                           
-                                         </div>
-                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
-                                           <ExternalLink size={20} />
-                                         </div>
-                                       </motion.a>
-
-                                           ))}
-                                         </div>
-                                       </div>
-                                     )}
+                                     ))}
                                   </div>
                                )}
                             </div>
@@ -747,7 +660,6 @@ export default function App() {
               </div>
             </motion.div>
           )}
-
           {currentView === "source" && (
             <motion.div
               key="source"
@@ -770,161 +682,47 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Global Filters for Exams */}
-              <section className="flex flex-col gap-5 p-2 transition-colors relative z-10 w-full mb-4">
-                {/* 2. Exam Type & Source Type Filter Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Exam Type Filter */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider ml-1">
-                      สนามสอบ
-                    </span>
-                    <div className="flex gap-2 p-1 rounded-xl overflow-x-auto transition-colors scrollbar-none">
-                      {examTypes.map((et) => (
-                        <button
-                          key={et}
-                          onClick={() => setSelectedExamType(et)}
-                          className={`relative flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
-                            selectedExamType === et
-                              ? "text-white"
-                              : "text-neutral-700 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                          }`}
-                        >
-                          {selectedExamType === et && (
-                            <motion.div
-                              layoutId="source-active-exam-type"
-                              className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
-                              transition={{
-                                type: "spring",
-                                bounce: 0.2,
-                                duration: 0.6,
-                              }}
-                            />
-                          )}
-                          <span className="relative z-10">{et}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Source Type Filter */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider ml-1">
-                      ผู้จัดทำ / แหล่งที่มา
-                    </span>
-                    <div className="flex p-1 rounded-xl transition-colors relative">
-                      <button
-                        onClick={() => setSourceType("All")}
-                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
-                          sourceType === "All"
-                            ? "text-white"
-                            : "text-neutral-700 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                        }`}
-                      >
-                        {sourceType === "All" && (
-                          <motion.div
-                            layoutId="source-active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
-                            transition={{
-                              type: "spring",
-                              bounce: 0.2,
-                              duration: 0.6,
-                            }}
-                          />
-                        )}
-                        <span className="relative z-10">ทั้งหมด</span>
-                      </button>
-                      <button
-                        onClick={() => setSourceType("Official")}
-                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
-                          sourceType === "Official"
-                            ? "text-white"
-                            : "text-neutral-700 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                        }`}
-                      >
-                        {sourceType === "Official" && (
-                          <motion.div
-                            layoutId="source-active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
-                            transition={{
-                              type: "spring",
-                              bounce: 0.2,
-                              duration: 0.6,
-                            }}
-                          />
-                        )}
-                        <span className="relative z-10">ผู้ออกข้อสอบ</span>
-                      </button>
-                      <button
-                        onClick={() => setSourceType("Unofficial")}
-                        className={`relative flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-center ${
-                          sourceType === "Unofficial"
-                            ? "text-white"
-                            : "text-neutral-700 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                        }`}
-                      >
-                        {sourceType === "Unofficial" && (
-                          <motion.div
-                            layoutId="source-active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
-                            transition={{
-                              type: "spring",
-                              bounce: 0.2,
-                              duration: 0.6,
-                            }}
-                          />
-                        )}
-                        <span className="relative z-10">รวบรวม</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Search Bar */}
-                <div className="flex flex-col gap-2 border-t border-neutral-200/40 dark:border-neutral-800/50 pt-3">
-                  <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider ml-1">
-                    ค้นหาอย่างละเอียด
-                  </span>
-                  <div className="relative group w-full">
-                    <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] dark:group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] transition-colors"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      placeholder="ค้นหาแหล่งข้อมูลโดยพิมพ์ ชื่อรายชื่อ, รายวิชา..."
-                      className="w-full bg-transparent border border-neutral-300 dark:border-neutral-700 rounded-xl py-3 pl-12 pr-4 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]/50 dark:focus:ring-[#FF00FF]/50 focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF] transition-all"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={() => setSearchTerm("")}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
-                      >
-                        <XCircle size={18} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Clear Filters (if active) */}
-                {(searchTerm || sourceType !== "All" || selectedExamType !== "All") && (
-                  <div className="flex justify-end mt-2">
+              {/* Search Bar for Source View */}
+              <div className="flex flex-col gap-4 relative z-10 w-full mb-4 px-2 md:px-0">
+                {/* Filter Tags */}
+                <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto w-full">
+                  {["ทั้งหมด", "สรุปเนื้อหา", "แบบฝึกหัด"].map((filterName) => (
                     <button
-                      onClick={() => {
-                        setSearchTerm("");
-                        setSourceType("All");
-                        setSelectedExamType("All");
-                        setSelectedCategory("All");
-                      }}
-                      className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-sm font-bold hover:underline focus:outline-none transition-colors"
+                      key={filterName}
+                      onClick={() => setSelectedSourceFilter(filterName)}
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        selectedSourceFilter === filterName
+                          ? "bg-[#09D1C7] dark:bg-[#FF00FF] text-white shadow-md"
+                          : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:border-[#09D1C7]/50 dark:hover:border-[#FF00FF]/50"
+                      }`}
                     >
-                      ล้างตัวกรองทั้งหมด
+                      {filterName}
                     </button>
-                  </div>
-                )}
-              </section>
+                  ))}
+                </div>
+
+                <div className="relative group w-full max-w-2xl mx-auto">
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-[#09D1C7] dark:group-focus-within:text-[#FF00FF] transition-colors"
+                    size={20}
+                  />
+                  <input
+                    type="text"
+                    placeholder="ค้นหาแหล่งข้อมูลโดยพิมพ์ชื่อ หรือรายละเอียด..."
+                    className="w-full bg-white dark:bg-transparent border border-neutral-300 dark:border-neutral-700 rounded-xl py-3 pl-12 pr-4 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7]/50 dark:focus:ring-[#FF00FF]/50 focus:border-[#09D1C7] dark:focus:border-[#FF00FF] transition-all shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
+                    >
+                      <XCircle size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
 
               {/* Source Grid (Old Exams UI style) */}
               <div className="flex justify-between items-center w-full relative z-10 mb-2 px-1">
@@ -933,39 +731,56 @@ export default function App() {
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pb-10">
-                {filteredSourceLinks.length === 0 ? (
-                  <div className="col-span-1 md:col-span-2 text-center py-10 text-neutral-700 dark:text-neutral-400">
-                    ไม่พบแหล่งข้อมูลที่ค้นหาในหมวดหมู่นี้
-                  </div>
-                ) : (
-                  filteredSourceLinks.map((link) => (
-                    <motion.a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      key={link.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                <AnimatePresence mode="popLayout">
+                  {filteredSourceLinks.length === 0 ? (
+                    <motion.div
+                      key="empty-state"
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.2 }}
+                      className="col-span-1 md:col-span-2 text-center py-10 text-neutral-700 dark:text-neutral-400"
                     >
-                      <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
-                        <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={link.subjects?.[0] === "คณิตศาสตร์" ? "Math" : link.subjects?.[0] === "ฟิสิกส์" ? "Phys" : link.subjects?.[0] === "เคมี" ? "Chem" : link.subjects?.[0] === "ชีววิทยา" ? "Bio" : "All"} />
-                      </div>
+                      ไม่พบแหล่งข้อมูลที่ค้นหาในหมวดหมู่นี้
+                    </motion.div>
+                  ) : (
+                    filteredSourceLinks.map((link) => (
+                      <motion.a
+                        layout
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        key={link.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                      >
                       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                        <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
-                          {link.title}
-                        </h3>
+                        {link.title && (
+                          <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
+                            {link.title}
+                          </h3>
+                        )}
                         <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
                           {link.description}
                         </p>
-                      </div>
-                      <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
-                        <ExternalLink size={20} />
+                        {link.tags && link.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {link.tags.map((tag, index) => (
+                              <span key={index} className="px-2 py-0.5 text-[10px] sm:text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-md border border-neutral-200 dark:border-neutral-700">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </motion.a>
                   ))
                 )}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}
@@ -1220,7 +1035,13 @@ export default function App() {
                     if (window.confirm("คุณต้องการรีเซ็ตข้อมูลแหล่งข้อสอบกลับเป็นค่าเริ่มต้นทั้งหมดหรือไม่?")) {
                       localStorage.removeItem("customExternalLinks");
                       localStorage.removeItem("customSourceLinks");
-                      setLocalExternalLinks([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
+                      setLocalExternalLinks([
+    ...mathLinks.map(l => ({ ...l, category: "คณิตศาสตร์" })),
+    ...physicsLinks.map(l => ({ ...l, category: "ฟิสิกส์" })),
+    ...chemistryLinks.map(l => ({ ...l, category: "เคมี" })),
+    ...biologyLinks.map(l => ({ ...l, category: "ชีววิทยา" })),
+    ...englishLinks.map(l => ({ ...l, category: "ภาษาอังกฤษ" }))
+  ]);
                       setLocalSourceLinks(sourceLinks);
                     }
                   }}
@@ -1255,9 +1076,6 @@ export default function App() {
                         title: 'แหล่งข้อสอบใหม่',
                         description: 'คำอธิบายแหล่งข้อสอบ',
                         url: 'https://',
-                        subjects: ['คณิตศาสตร์'],
-                        examTypes: ['อื่น ๆ'],
-                        isOfficialSource: false,
                         logoUrl: ''
                       };
                       setLocalExternalLinks([...localExternalLinks, newItem]);
@@ -1313,7 +1131,13 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     if (confirm("คุณต้องการรีเซ็ตแหล่งข้อสอบทั้งหมดกลับไปเป็นค่าเริ่มต้นหรือไม่?")) {
-                      setLocalExternalLinks([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
+                      setLocalExternalLinks([
+    ...mathLinks.map(l => ({ ...l, category: "คณิตศาสตร์" })),
+    ...physicsLinks.map(l => ({ ...l, category: "ฟิสิกส์" })),
+    ...chemistryLinks.map(l => ({ ...l, category: "เคมี" })),
+    ...biologyLinks.map(l => ({ ...l, category: "ชีววิทยา" })),
+    ...englishLinks.map(l => ({ ...l, category: "ภาษาอังกฤษ" }))
+  ]);
                       setEditingLink(null);
                     }
                   }}
@@ -1425,106 +1249,6 @@ export default function App() {
                           setLocalExternalLinks(localExternalLinks.map(l => l.id === editingLink.id ? updated : l));
                         }}
                       />
-                    </div>
-
-                    {/* Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Subjects Selection */}
-                      <div className="flex flex-col gap-2 text-left">
-                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">วิชาที่เกี่ยวข้อง</label>
-                        <div className="flex flex-col gap-1.5">
-                          {['รวมทุกวิชา', 'คณิตศาสตร์', 'ฟิสิกส์', 'เคมี', 'ชีววิทยา'].map((subj) => {
-                            const hasSubj = editingLink.subjects?.includes(subj);
-                            return (
-                              <label key={subj} className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 cursor-pointer">
-                                <input 
-                                  type="checkbox"
-                                  checked={hasSubj}
-                                  className="rounded border-neutral-300 text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
-                                  onChange={() => {
-                                    let newSubjs = [...(editingLink.subjects || [])];
-                                    if (hasSubj) {
-                                      newSubjs = newSubjs.filter(s => s !== subj);
-                                    } else {
-                                      newSubjs.push(subj);
-                                    }
-                                    const updated = { ...editingLink, subjects: newSubjs };
-                                    setEditingLink(updated);
-                                    setLocalExternalLinks(localExternalLinks.map(l => l.id === editingLink.id ? updated : l));
-                                  }}
-                                />
-                                {subj}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Exam Types */}
-                      <div className="flex flex-col gap-2 text-left">
-                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">สนามสอบ</label>
-                        <div className="flex flex-col gap-1.5">
-                          {['สอวน. (POSN)', 'TCAS / A-Level', 'อื่น ๆ'].map((et) => {
-                            const hasEt = editingLink.examTypes?.includes(et);
-                            return (
-                              <label key={et} className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 cursor-pointer">
-                                <input 
-                                  type="checkbox"
-                                  checked={hasEt}
-                                  className="rounded border-neutral-300 text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
-                                  onChange={() => {
-                                    let newEts = [...(editingLink.examTypes || [])];
-                                    if (hasEt) {
-                                      newEts = newEts.filter(e => e !== et);
-                                    } else {
-                                      newEts.push(et);
-                                    }
-                                    const updated = { ...editingLink, examTypes: newEts };
-                                    setEditingLink(updated);
-                                    setLocalExternalLinks(localExternalLinks.map(l => l.id === editingLink.id ? updated : l));
-                                  }}
-                                />
-                                {et}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Official Source Toggle */}
-                      <div className="flex flex-col gap-2 text-left">
-                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">ประเภทผู้จัดทำ</label>
-                        <div className="flex flex-col gap-2">
-                          <label className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 cursor-pointer">
-                            <input 
-                              type="radio"
-                              name="isOfficial"
-                              checked={editingLink.isOfficialSource === true}
-                              className="text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
-                              onChange={() => {
-                                const updated = { ...editingLink, isOfficialSource: true };
-                                setEditingLink(updated);
-                                setLocalExternalLinks(localExternalLinks.map(l => l.id === editingLink.id ? updated : l));
-                              }}
-                            />
-                            ผู้ออกข้อสอบ (Official)
-                          </label>
-                          <label className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 cursor-pointer">
-                            <input 
-                              type="radio"
-                              name="isOfficial"
-                              checked={editingLink.isOfficialSource !== true}
-                              className="text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
-                              onChange={() => {
-                                const updated = { ...editingLink, isOfficialSource: false };
-                                setEditingLink(updated);
-                                setLocalExternalLinks(localExternalLinks.map(l => l.id === editingLink.id ? updated : l));
-                              }}
-                            />
-                            รวบรวมเพิ่มเติม (Unofficial)
-                          </label>
-                        </div>
-                      </div>
                     </div>
 
                     <div className="mt-4 flex justify-end">

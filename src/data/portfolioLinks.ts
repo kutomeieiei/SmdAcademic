@@ -21,7 +21,7 @@ export const portfolioLinks: PortfolioItem[] = [
   },
   {
     id: "3",
-    url: "https://drive.google.com/file/d/1kRqyI6moN_3PfA9WC9EvFL7iokaHy5s_/view?usp=drive_link",
+    url: "https://drive.google.com/file/d/1Xp8sLyL8ahyl2gRhYWN24OVGJlwkOF23/view?usp=drive_link",
     tags: ["Veterinary", "KKU"],
     ownerName: "พี่ทัน",
     ownerFullName: "นางสาวธัญวรัตม์ จาตุรนต์",

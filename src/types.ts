@@ -5,10 +5,11 @@ export interface ExternalLinkItem {
   title: string;
   description: string;
   url: string;
-  subjects: string[];
+  subjects?: string[];
   isOfficialSource?: boolean;
   examTypes?: string[];
   logoUrl?: string;
+  tags?: string[];
 }
 
 export interface PortfolioItem {

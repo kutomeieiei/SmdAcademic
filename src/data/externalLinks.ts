@@ -13,9 +13,6 @@ export const mathLinks: ExternalLinkItem[] = [
     title: 'Rath Center Mathematics',
     description: 'รวบรวมข้อสอบคณิตศาสตร์มัธยมปลาย สมาคมคณิตศาสตร์ สอวน. และข้อสอบแข่งขันคณิตศาสตร์ต่างๆ มากมาย',
     url: 'http://www.rathcenter.com/',
-    subjects: ['คณิตศาสตร์'],
-    isOfficialSource: true,
-    examTypes: ['สอวน. (POSN)', 'TCAS / A-Level'],
     logoUrl: ''
   }
 ];
@@ -26,9 +23,6 @@ export const physicsLinks: ExternalLinkItem[] = [
     title: 'รวมข้อสอบฟิสิกส์',
     description: 'แหล่งรวมข้อสอบเก่าฟิสิกส์ (เปลี่ยนลิงก์ได้เลย)',
     url: '#',
-    subjects: ['ฟิสิกส์'],
-    isOfficialSource: false,
-    examTypes: ['TCAS / A-Level'],
     logoUrl: ''
   }
 ];
@@ -39,9 +33,6 @@ export const chemistryLinks: ExternalLinkItem[] = [
     title: 'รวมข้อสอบเคมี',
     description: 'แหล่งรวมข้อสอบเก่าเคมี (เปลี่ยนลิงก์ได้เลย)',
     url: '#',
-    subjects: ['เคมี'],
-    isOfficialSource: false,
-    examTypes: ['TCAS / A-Level'],
     logoUrl: ''
   }
 ];
@@ -52,9 +43,17 @@ export const biologyLinks: ExternalLinkItem[] = [
     title: 'รวมข้อสอบชีววิทยา',
     description: 'แหล่งรวมข้อสอบเก่าชีววิทยา (เปลี่ยนลิงก์ได้เลย)',
     url: '#',
-    subjects: ['ชีววิทยา'],
-    isOfficialSource: false,
-    examTypes: ['TCAS / A-Level'],
     logoUrl: ''
   }
 ];
+
+export const englishLinks: ExternalLinkItem[] = [
+  {
+    id: 'eng1',
+    title: 'ข้อสอบ A-level อังกฤษ',
+    description: 'A-level Eng 55-68 พร้อมเฉลยรวบรวมทำโดย PMooktutor',
+    url: 'https://drive.google.com/drive/folders/1_q8-8vlr3xay0hRvMzsv5dkuYDIV8kAi',
+    logoUrl: 'https://drive.google.com/file/d/1iWHLZN8oUCwcbDpVD6h1wc2cVJCpU8-9/view?usp=drive_link'
+  }
+];
+
