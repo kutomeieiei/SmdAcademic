@@ -581,11 +581,11 @@ export default function App() {
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight transition-colors text-neutral-700 dark:text-white">
                   ค้นหา{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
-                    แหล่งข้อสอบเก่า
+                    แหล่งข้อสอบ
                   </span>
                 </h2>
                 <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
-                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือแบบฝึกหัดจากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
+                  รวบรวมไฟล์หรือช่องทางเเหล่งข้อสอบต่างๆ ครอบคลุมวิชาหลักสำหรับเตรียมความพร้อมก่อนสอบสนามต่างๆ
                 </p>
               </div>
 
@@ -703,7 +703,7 @@ export default function App() {
                   </span>
                 </h2>
                 <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
-                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือแบบฝึกหัดจากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
+                  รวบรวมเเหล่งเเบบฝึกหัดเเละเเหล่งเนื้อหาสรุปวิชาต่างๆ เพื่อเรียนรู้ได้ง่ายมากขึ้น 
                 </p>
               </div>
 
@@ -840,7 +840,7 @@ export default function App() {
                     type="text"
                     value={portfolioSearch}
                     onChange={(e) => setPortfolioSearch(e.target.value)}
-                    placeholder="ค้นหาชื่อผู้จัดทำ คณะ มหาวิทยาลัย หรือแท็ก..."
+                    placeholder="ค้นหาสาขาเเละมหาวิทยาลัยที่สนใจ"
                     className="w-full bg-white/40 dark:bg-neutral-950 border border-neutral-300/80 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-10 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]/50 dark:focus:ring-[#FF00FF]/50 focus:border-transparent transition-all shadow-sm"
                   />
                   {portfolioSearch && (
@@ -990,7 +990,7 @@ export default function App() {
                     แหล่งเพิ่มเติม
                   </h3>
                   <p className="text-neutral-700 dark:text-white/90 text-sm">
-                    แหล่งรวมเว็บไซต์และแหล่งข้อมูลเพิ่มเติมเพื่อเป็นแนวทางและไอเดียในการทำพอร์ตโฟลิโอ
+                    เเหล่งข้อมูลเพิ่มเติมที่รวบรวมตัวอย่าง Portfolio เพื่อเป็นเเนวทางเเละไอเดียให้น้องๆ
                   </p>
                 </div>
                 
