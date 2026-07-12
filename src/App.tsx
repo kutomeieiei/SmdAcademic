@@ -33,31 +33,71 @@ import {
   Edit2,
   Save,
   RotateCcw,
+  Moon,
+  Sun,
 } from "lucide-react";
 import oripiusIcon from "./assets/icons/oripius.png";
-import { externalLinks } from "./data/externalLinks";
+import { mathLinks, physicsLinks, chemistryLinks, biologyLinks } from "./data/externalLinks";
 import { portfolioLinks } from "./data/portfolioLinks";
+import { sourceLinks } from "./data/sourceLinks";
 import { motion, AnimatePresence } from "motion/react";
 
-export default function App() {
-  const [localExternalLinks, setLocalExternalLinks] = useState<any[]>(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("customExternalLinks") : null;
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Error parsing customExternalLinks", e);
-      }
+interface ExamSourceLogoProps {
+  logoUrl?: string;
+  title: string;
+  shortName: string;
+}
+
+function ExamSourceLogo({ logoUrl, title, shortName }: ExamSourceLogoProps) {
+  const [imageError, setImageError] = useState(false);
+  useEffect(() => { setImageError(false); }, [logoUrl]);
+
+  // Parse Drive direct link
+  const getGoogleDriveDirectLink = (url: string | undefined): string | null => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    const match = trimmed.match(/(?:id=|\/d\/|folders\/)([a-zA-Z0-9-_]{25,50})/);
+    if (match && match[1]) {
+      return `https://lh3.googleusercontent.com/d/${match[1]}=w1000`;
     }
-    return externalLinks;
-  });
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:image')) {
+      return trimmed;
+    }
+    return null;
+  };
+
+  const directLink = logoUrl ? getGoogleDriveDirectLink(logoUrl) : null;
+
+  if (directLink && !imageError) {
+    return (
+      <img
+        src={directLink}
+        alt={title}
+        referrerPolicy="no-referrer"
+        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain bg-white dark:bg-neutral-800 p-1 border border-neutral-200 dark:border-neutral-700 shadow-sm transition-transform duration-300"
+        onError={() => setImageError(true)}
+      />
+    );
+  }
+
+  return (
+    <>
+      {shortName === "Math" && <Calculator className="w-8 h-8 sm:w-10 sm:h-10" />}
+      {shortName === "Phys" && <Atom className="w-8 h-8 sm:w-10 sm:h-10" />}
+      {shortName === "Chem" && <FlaskConical className="w-8 h-8 sm:w-10 sm:h-10" />}
+      {shortName === "Bio" && <Dna className="w-8 h-8 sm:w-10 sm:h-10" />}
+    </>
+  );
+}
+
+export default function App() {
+  const [localExternalLinks, setLocalExternalLinks] = useState<any[]>([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
 
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<any | null>(null);
 
-  useEffect(() => {
-    localStorage.setItem("customExternalLinks", JSON.stringify(localExternalLinks));
-  }, [localExternalLinks]);
+  const [localSourceLinks, setLocalSourceLinks] = useState<any[]>(sourceLinks);
 
   function getGoogleDriveDirectLink(url: string | undefined): string | null {
     if (!url) return null;
@@ -66,7 +106,7 @@ export default function App() {
     // Match Google Drive files
     const match = trimmed.match(/(?:id=|\/d\/|folders\/)([a-zA-Z0-9-_]{25,50})/);
     if (match && match[1]) {
-      return `https://lh3.googleusercontent.com/d/${match[1]}`;
+      return `https://lh3.googleusercontent.com/d/${match[1]}=w1000`;
     }
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:image')) {
       return trimmed;
@@ -75,7 +115,7 @@ export default function App() {
   }
 
   const [currentView, setCurrentView] = useState<
-    "home" | "exams" | "about" | "more-exams" | "portfolio"
+    "home" | "exams" | "source" | "about" | "more-exams" | "portfolio"
   >("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,6 +134,28 @@ export default function App() {
   };
 
   const [portfolioLimit, setPortfolioLimit] = useState(getPortfolioStep());
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        return savedTheme === "dark";
+      }
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDarkMode) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     setPortfolioLimit(getPortfolioStep());
@@ -175,6 +237,34 @@ export default function App() {
     return matchesSearch && matchesSource && matchesExamType;
   });
 
+  const filteredSourceLinks = localSourceLinks.filter((link) => {
+    const matchesSearch =
+      link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (link.subjects &&
+        link.subjects.some((sub) =>
+          sub.toLowerCase().includes(searchTerm.toLowerCase()),
+        ));
+    
+    let matchesSource = true;
+    if (sourceType === "Official") {
+      matchesSource = link.isOfficialSource === true;
+    } else if (sourceType === "Unofficial") {
+      matchesSource = link.isOfficialSource !== true;
+    }
+
+    let matchesExamType = true;
+    if (selectedExamType !== "All") {
+      if (selectedExamType === "อื่น ๆ") {
+        matchesExamType = !link.examTypes || link.examTypes.every(et => et !== "สอวน. (POSN)" && et !== "TCAS / A-Level");
+      } else {
+        matchesExamType = link.examTypes ? link.examTypes.includes(selectedExamType) : false;
+      }
+    }
+
+    return matchesSearch && matchesSource && matchesExamType;
+  });
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Background Decorative Elements */}
@@ -183,7 +273,7 @@ export default function App() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#f0f2f5]/90 dark:bg-[#050505]/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900 transition-colors">
+      <header className="sticky top-0 z-50 bg-white/30 dark:bg-[#050505]/80 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-900/50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-4">
@@ -191,7 +281,7 @@ export default function App() {
                 <img src={oripiusIcon} alt="Profile" className="w-full h-full object-cover" /> 
               </div>
               <div className="flex flex-col">
-                <h1 className="font-bold text-2xl leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] transition-colors">
+                <h1 className="font-bold text-2xl leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-colors">
                   Oripius
                 </h1>
                 <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-400 transition-colors mt-0.5">
@@ -206,6 +296,12 @@ export default function App() {
                 className={`text-sm font-bold transition-colors ${currentView === "home" ? "text-neutral-700 dark:text-neutral-100" : "text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 Home
+              </button>
+              <button
+                onClick={() => setCurrentView("source")}
+                className={`text-sm font-bold transition-colors ${currentView === "source" ? "text-neutral-700 dark:text-neutral-100" : "text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
+              >
+                Source
               </button>
               <button
                 onClick={() => setCurrentView("exams")}
@@ -225,9 +321,23 @@ export default function App() {
               >
                 About Us
               </button>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 text-neutral-700 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 ml-2"
+                aria-label="Toggle dark mode"
+              >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
             </div>
 
             <div className="flex sm:hidden items-center gap-2">
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 text-neutral-700 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                aria-label="Toggle dark mode"
+              >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -246,7 +356,7 @@ export default function App() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="sm:hidden border-t border-neutral-200 dark:border-neutral-800 bg-[#f0f2f5] dark:bg-neutral-950 overflow-hidden"
+              className="sm:hidden border-t border-neutral-200/50 dark:border-neutral-800 bg-white/60 dark:bg-neutral-950 backdrop-blur-md overflow-hidden"
             >
               <div className="px-4 py-4 flex flex-col gap-4">
                 <button
@@ -257,6 +367,15 @@ export default function App() {
                   className={`text-left text-base font-medium transition-colors ${currentView === "home" ? "text-neutral-700 dark:text-neutral-300" : "text-neutral-700 dark:text-neutral-400"}`}
                 >
                   Home
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentView("source");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-left text-base font-medium transition-colors ${currentView === "source" ? "text-neutral-700 dark:text-neutral-300" : "text-neutral-700 dark:text-neutral-400"}`}
+                >
+                  Source
                 </button>
                 <button
                   onClick={() => {
@@ -304,13 +423,13 @@ export default function App() {
               className="flex flex-col items-center justify-start w-[100vw] relative left-1/2 -translate-x-1/2 -mt-8 min-h-[70vh]"
             >
               {/* Top Section */}
-              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-[#f0f2f5] dark:bg-[#050505] text-neutral-700 dark:text-white pt-24 pb-8 flex flex-col items-center z-[40]">
+              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-transparent dark:bg-transparent text-neutral-700 dark:text-white pt-24 pb-8 flex flex-col items-center z-[40]">
                 {/* Removed Ambient Background Glow Container for minimal look */}
 
                 <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-6 relative z-[30] w-full">
                   <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight whitespace-nowrap text-neutral-700 dark:text-white">
                     ยินดีต้อนรับเข้าสู่{" "}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
                       Oripius
                     </span>
                   </h2>
@@ -321,13 +440,13 @@ export default function App() {
               </div>
 
               {/* Bottom Section */}
-              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-[#f0f2f5] dark:bg-[#050505] text-neutral-700 dark:text-white pt-10 pb-24 mt-auto z-[30] flex flex-col items-center">
+              <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-transparent dark:bg-transparent text-neutral-700 dark:text-white pt-10 pb-24 mt-auto z-[30] flex flex-col items-center">
                 {/* Removed Ambient Background Glow Container for minimal look */}
 
                 <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col gap-12 text-left relative z-10">
                   <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]">
-                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] text-3xl font-normal -rotate-12 transform">✦</span>
+                    <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
+                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl font-normal -rotate-12 transform">✦</span>
                       Exams
                     </h3>
                     <p className="text-neutral-700 dark:text-white/90 text-lg leading-relaxed mb-2">
@@ -344,7 +463,7 @@ export default function App() {
                   {/* Infinite Scroll Carousel */}
                   <div className="w-[100vw] relative left-1/2 -translate-x-1/2 bg-transparent py-4 flex items-center justify-center my-8 overflow-hidden">
                     <div className="w-full inline-flex flex-nowrap overflow-hidden">
-                      <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 sm:[&_li]:mx-8 [&_li]:text-xs sm:[&_li]:text-base [&_li]:font-black [&_li]:text-transparent [&_li]:bg-clip-text [&_li]:bg-gradient-to-r [&_li]:from-[#09D1C7] [&_li]:via-[#28D8B9] [&_li]:to-[#46DFB1] [&_li]:whitespace-nowrap [&_li]:tracking-widest animate-infinite-scroll w-max">
+                      <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 sm:[&_li]:mx-8 [&_li]:text-xs sm:[&_li]:text-base [&_li]:font-black [&_li]:text-transparent [&_li]:bg-clip-text [&_li]:bg-gradient-to-r [&_li]:from-[#09D1C7] [&_li]:via-[#28D8B9] [&_li]:to-[#46DFB1] dark:[&_li]:from-[#FF00FF] dark:[&_li]:via-[#FF007F] dark:[&_li]:to-[#FF0000] [&_li]:whitespace-nowrap [&_li]:tracking-widest animate-infinite-scroll w-max">
                         <li>POSN</li>
                         <li>TCAS</li>
                         <li>NETSAT</li>
@@ -383,8 +502,8 @@ export default function App() {
                   </div>
                   
                   <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]">
-                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] text-3xl font-normal -rotate-12 transform">✦</span>
+                    <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
+                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl font-normal -rotate-12 transform">✦</span>
                       Portfolio
                     </h3>
                     <p className="text-neutral-700 dark:text-white/90 text-lg leading-relaxed mb-2">
@@ -412,11 +531,11 @@ export default function App() {
               className="max-w-3xl mx-auto py-20 px-4 sm:px-0 flex flex-col items-center justify-center text-center gap-12 w-full min-h-[60vh] relative z-10"
             >
               <div className="flex flex-col gap-2 items-center">
-                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] text-3xl md:text-5xl mb-4 font-normal -rotate-12 transform">✦</span>
+                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl md:text-5xl mb-4 font-normal -rotate-12 transform">✦</span>
                 <h2 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-500 tracking-tight transition-colors">
                   We Are Oripius Academic Team
                 </h2>
-                <h3 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] mt-2">
+                <h3 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] mt-2">
                   SMD Leadership 44
                 </h3>
               </div>
@@ -433,7 +552,7 @@ export default function App() {
                   หากมีเข็มทิศนำทางที่ดี พวกเราพร้อมที่จะเป็นเข็มทิศให้ทุกๆคน
                 </p>
                 <div className="w-full text-center mt-6">
-                  <p className="font-semibold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] relative inline-block">
+                  <p className="font-semibold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] relative inline-block">
                     จุดหมายที่ดูไกล มันจะใกล้
                   </p>
                 </div>
@@ -442,7 +561,7 @@ export default function App() {
               <div className="flex flex-col items-start gap-6 mt-8 pt-10 border-t border-neutral-200/50 dark:border-neutral-800/50 w-full text-left">
                 <h3 className="text-xl font-bold text-neutral-700 dark:text-white">Contact Us</h3>
                 <div className="w-full text-left text-neutral-700 dark:text-neutral-400">
-                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] hover:underline font-bold">Feedback</a>
+                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] hover:underline font-bold">Feedback</a>
                 </div>
               </div>
             </motion.section>
@@ -461,8 +580,189 @@ export default function App() {
               <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-4 mb-4 relative z-10">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight transition-colors text-neutral-700 dark:text-white">
                   ค้นหา{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
                     แหล่งข้อสอบเก่า
+                  </span>
+                </h2>
+                <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
+                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือ Mock-test จากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
+                </p>
+              </div>
+
+
+
+              {/* Subject Accordions */}
+              <div className="flex justify-between items-center w-full relative z-10 mb-2 px-1">
+                <span className="text-sm text-neutral-700 dark:text-neutral-400">
+                  พบข้อมูลทั้งหมด {filteredExternalLinks.length} รายการ
+                </span>
+              </div>
+              <div className="flex flex-col gap-4 w-full pb-10">
+                {[
+                  { id: "คณิตศาสตร์", name: "คณิตศาสตร์", shortName: "Math" },
+                  { id: "ฟิสิกส์", name: "ฟิสิกส์", shortName: "Phys" },
+                  { id: "เคมี", name: "เคมี", shortName: "Chem" },
+                  { id: "ชีววิทยา", name: "ชีววิทยา", shortName: "Bio" },
+                ].map((subject) => {
+                  const isExpanded = selectedCategory === subject.id;
+                  
+                  // Filter the already filtered external links specifically for this subject
+                  const subjectLinks = filteredExternalLinks.filter(link => 
+                     link.subjects && (link.subjects.includes(subject.id) || link.subjects.includes("รวมทุกวิชา"))
+                  );
+
+                  return (
+                    <div key={subject.id} className="w-full bg-transparent border border-transparent rounded-2xl overflow-hidden transition-all duration-300">
+                      <button
+                        onClick={() => setSelectedCategory(isExpanded ? "All" : subject.id)}
+                        className="w-full p-5 sm:p-6 text-left group transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-800/20"
+                      >
+                         <div className="w-full flex flex-row items-center justify-between pb-2 relative">
+                           {/* Gradient bottom line under subject title */}
+                           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]" />
+                           <div className="flex items-center gap-4 sm:gap-5">
+
+                            <div className="flex items-center justify-center w-12 sm:w-16">
+                               <span className="font-mono text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-all duration-300 group-hover:scale-110">{subject.shortName}</span>
+                            </div>
+                            <span className="text-xl sm:text-2xl font-bold tracking-wide transition-colors text-neutral-700 dark:text-neutral-100 group-hover:text-[#09D1C7] dark:group-hover:text-[#FF00FF]">
+                              {subject.name}
+                            </span>
+                         </div>
+                         <div className="flex items-center gap-3 sm:gap-4">
+                            <span className="hidden sm:inline-block text-sm font-medium text-neutral-700 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
+                               {subjectLinks.length} แหล่งข้อสอบ
+                            </span>
+                            <ChevronDown className={`w-6 h-6 text-[#09D1C7] dark:text-[#FF00FF] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                         </div>
+                         </div>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-4 sm:p-6 bg-white/30 dark:bg-[#0a0a0a]/50 backdrop-blur-sm">
+                               {subjectLinks.length === 0 ? (
+                                  <div className="text-center py-10 text-neutral-700 dark:text-neutral-400">
+                                    ไม่พบแหล่งข้อสอบที่ค้นหาในหมวดหมู่นี้
+                                  </div>
+                               ) : (
+                                  <div className="flex flex-col gap-8">
+                                     {subjectLinks.filter(l => l.isOfficialSource).length > 0 && (
+                                       <div className="flex flex-col gap-4">
+                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+                                           <Building2 size={16} className="text-[#09D1C7] dark:text-[#FF00FF]" />
+                                           สนามสอบ
+                                         </h4>
+                                         <div className="flex flex-col gap-4">
+                                           {subjectLinks.filter(l => l.isOfficialSource).map((link) => (
+                                             
+                                       <motion.a
+                                         href={link.url}
+                                         target="_blank"
+                                         rel="noopener noreferrer"
+                                         key={link.id}
+                                         initial={{ opacity: 0, y: 10 }}
+                                         animate={{ opacity: 1, y: 0 }}
+                                         transition={{ duration: 0.3 }}
+                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                                       >
+                                         <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
+                                            <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={subject.shortName} />
+                                          </div>
+                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
+                                             {link.title}
+                                           </h3>
+                                           <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                                             {link.description}
+                                           </p>
+                                           
+                                         </div>
+                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
+                                           <ExternalLink size={20} />
+                                         </div>
+                                       </motion.a>
+
+                                           ))}
+                                         </div>
+                                       </div>
+                                     )}
+                                     
+                                     {subjectLinks.filter(l => !l.isOfficialSource).length > 0 && (
+                                       <div className="flex flex-col gap-4">
+                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+                                           <BookOpen size={16} className="text-[#09D1C7] dark:text-[#FF00FF]" />
+                                           แหล่งสอบเพิ่มเติม
+                                         </h4>
+                                         <div className="flex flex-col gap-4">
+                                           {subjectLinks.filter(l => !l.isOfficialSource).map((link) => (
+                                             
+                                       <motion.a
+                                         href={link.url}
+                                         target="_blank"
+                                         rel="noopener noreferrer"
+                                         key={link.id}
+                                         initial={{ opacity: 0, y: 10 }}
+                                         animate={{ opacity: 1, y: 0 }}
+                                         transition={{ duration: 0.3 }}
+                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                                       >
+                                         <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
+                                            <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={subject.shortName} />
+                                          </div>
+                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
+                                             {link.title}
+                                           </h3>
+                                           <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                                             {link.description}
+                                           </p>
+                                           
+                                         </div>
+                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
+                                           <ExternalLink size={20} />
+                                         </div>
+                                       </motion.a>
+
+                                           ))}
+                                         </div>
+                                       </div>
+                                     )}
+                                  </div>
+                               )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {currentView === "source" && (
+            <motion.div
+              key="source"
+              initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex flex-col gap-8 w-full max-w-4xl mx-auto py-8 relative"
+            >
+              {/* Title Section matching Home View */}
+              <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-4 mb-4 relative z-10">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight transition-colors text-neutral-700 dark:text-white">
+                  ค้นหา{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
+                    แหล่งข้อมูล
                   </span>
                 </h2>
                 <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
@@ -492,8 +792,8 @@ export default function App() {
                         >
                           {selectedExamType === et && (
                             <motion.div
-                              layoutId="active-exam-type"
-                              className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] rounded-lg shadow-sm"
+                              layoutId="source-active-exam-type"
+                              className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
                               transition={{
                                 type: "spring",
                                 bounce: 0.2,
@@ -523,8 +823,8 @@ export default function App() {
                       >
                         {sourceType === "All" && (
                           <motion.div
-                            layoutId="active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] rounded-lg shadow-sm"
+                            layoutId="source-active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
                             transition={{
                               type: "spring",
                               bounce: 0.2,
@@ -544,8 +844,8 @@ export default function App() {
                       >
                         {sourceType === "Official" && (
                           <motion.div
-                            layoutId="active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] rounded-lg shadow-sm"
+                            layoutId="source-active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
                             transition={{
                               type: "spring",
                               bounce: 0.2,
@@ -565,8 +865,8 @@ export default function App() {
                       >
                         {sourceType === "Unofficial" && (
                           <motion.div
-                            layoutId="active-source-type"
-                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] rounded-lg shadow-sm"
+                            layoutId="source-active-source-type"
+                            className="absolute inset-0 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] rounded-lg shadow-sm"
                             transition={{
                               type: "spring",
                               bounce: 0.2,
@@ -587,13 +887,13 @@ export default function App() {
                   </span>
                   <div className="relative group w-full">
                     <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:group-focus-within:text-[#09D1C7] transition-colors"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] dark:group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] transition-colors"
                       size={20}
                     />
                     <input
                       type="text"
-                      placeholder="ค้นหาแหล่งข้อสอบโดยพิมพ์ ชื่อรายชื่อ, รายวิชา..."
-                      className="w-full bg-transparent border border-neutral-300 dark:border-neutral-700 rounded-xl py-3 pl-12 pr-4 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7]/50 dark:focus:ring-[#46DFB1]/50 focus:border-[#09D1C7] transition-all"
+                      placeholder="ค้นหาแหล่งข้อมูลโดยพิมพ์ ชื่อรายชื่อ, รายวิชา..."
+                      className="w-full bg-transparent border border-neutral-300 dark:border-neutral-700 rounded-xl py-3 pl-12 pr-4 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]/50 dark:focus:ring-[#FF00FF]/50 focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF] transition-all"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -618,7 +918,7 @@ export default function App() {
                         setSelectedExamType("All");
                         setSelectedCategory("All");
                       }}
-                      className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] text-sm font-bold hover:underline focus:outline-none transition-colors"
+                      className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-sm font-bold hover:underline focus:outline-none transition-colors"
                     >
                       ล้างตัวกรองทั้งหมด
                     </button>
@@ -626,183 +926,49 @@ export default function App() {
                 )}
               </section>
 
-              {/* Subject Accordions */}
+              {/* Source Grid (Old Exams UI style) */}
               <div className="flex justify-between items-center w-full relative z-10 mb-2 px-1">
                 <span className="text-sm text-neutral-700 dark:text-neutral-400">
-                  พบข้อมูลทั้งหมด {filteredExternalLinks.length} รายการ
+                  พบแหล่งข้อมูลทั้งหมด {filteredSourceLinks.length} รายการ
                 </span>
-                <button
-                  onClick={() => {
-                    setIsManageModalOpen(true);
-                    if (localExternalLinks.length > 0) {
-                      setEditingLink(localExternalLinks[0]);
-                    } else {
-                      setEditingLink(null);
-                    }
-                  }}
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl text-xs font-bold border border-neutral-200 dark:border-neutral-700 hover:border-[#09D1C7] dark:hover:border-[#46DFB1] transition-all flex items-center gap-2 shadow-sm active:scale-95 cursor-pointer"
-                >
-                  <Settings className="w-3.5 h-3.5 text-[#09D1C7] animate-spin" style={{ animationDuration: '4s' }} />
-                  จัดการแหล่งข้อสอบ & โลโก้
-                </button>
               </div>
-              <div className="flex flex-col gap-4 w-full pb-10">
-                {[
-                  { id: "คณิตศาสตร์", name: "คณิตศาสตร์", shortName: "Math" },
-                  { id: "ฟิสิกส์", name: "ฟิสิกส์", shortName: "Phys" },
-                  { id: "เคมี", name: "เคมี", shortName: "Chem" },
-                  { id: "ชีววิทยา", name: "ชีววิทยา", shortName: "Bio" },
-                ].map((subject) => {
-                  const isExpanded = selectedCategory === subject.id;
-                  
-                  // Filter the already filtered external links specifically for this subject
-                  const subjectLinks = filteredExternalLinks.filter(link => 
-                     link.subjects && (link.subjects.includes(subject.id) || link.subjects.includes("รวมทุกวิชา"))
-                  );
-
-                  return (
-                    <div key={subject.id} className={`w-full bg-transparent border ${isExpanded ? 'border-transparent' : 'border-transparent hover:border-[#09D1C7] dark:hover:border-[#46DFB1]/50'} rounded-2xl overflow-hidden transition-all duration-300`}>
-                      <button
-                        onClick={() => setSelectedCategory(isExpanded ? "All" : subject.id)}
-                        className="w-full p-5 sm:p-6 text-left group transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-800/20"
-                      >
-                         <div className="w-full flex flex-row items-center justify-between pb-2 relative">
-                           {/* Gradient bottom line under subject title */}
-                           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]" />
-                           <div className="flex items-center gap-4 sm:gap-5">
-
-                            <div className="flex items-center justify-center w-12 sm:w-16">
-                               <span className="font-mono text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] transition-all duration-300 group-hover:scale-110">{subject.shortName}</span>
-                            </div>
-                            <span className="text-xl sm:text-2xl font-bold tracking-wide transition-colors text-neutral-700 dark:text-neutral-100 group-hover:text-[#09D1C7] dark:group-hover:text-[#46DFB1]">
-                              {subject.name}
-                            </span>
-                         </div>
-                         <div className="flex items-center gap-3 sm:gap-4">
-                            <span className="hidden sm:inline-block text-sm font-medium text-neutral-700 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
-                               {subjectLinks.length} แหล่งข้อสอบ
-                            </span>
-                            <ChevronDown className={`w-6 h-6 text-[#09D1C7] dark:text-[#46DFB1] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
-                         </div>
-                         </div>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="overflow-hidden"
-                          >
-                            <div className="p-4 sm:p-6 bg-[#f0f2f5]/50 dark:bg-[#0a0a0a]/50">
-                               {subjectLinks.length === 0 ? (
-                                  <div className="text-center py-10 text-neutral-700 dark:text-neutral-400">
-                                    ไม่พบแหล่งข้อสอบที่ค้นหาในหมวดหมู่นี้
-                                  </div>
-                               ) : (
-                                  <div className="flex flex-col gap-8">
-                                     {subjectLinks.filter(l => l.isOfficialSource).length > 0 && (
-                                       <div className="flex flex-col gap-4">
-                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-                                           <Building2 size={16} className="text-[#09D1C7]" />
-                                           สนามสอบ
-                                         </h4>
-                                         <div className="flex flex-col gap-4">
-                                           {subjectLinks.filter(l => l.isOfficialSource).map((link) => (
-                                             
-                                       <motion.a
-                                         href={link.url}
-                                         target="_blank"
-                                         rel="noopener noreferrer"
-                                         key={link.id}
-                                         initial={{ opacity: 0, y: 10 }}
-                                         animate={{ opacity: 1, y: 0 }}
-                                         transition={{ duration: 0.3 }}
-                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7]/40 dark:hover:border-[#46DFB1]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
-                                       >
-                                                                                   <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#46DFB1] group-hover/card:scale-110 transition-transform duration-300">
-                                            {subject.shortName === "Math" && <Calculator className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Phys" && <Atom className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Chem" && <FlaskConical className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Bio" && <Dna className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                          </div>
-                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#09D1C7] transition-colors line-clamp-1">
-                                             {link.title}
-                                           </h3>
-                                           <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
-                                             {link.description}
-                                           </p>
-                                           
-                                         </div>
-                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] transition-colors pr-2">
-                                           <ExternalLink size={20} />
-                                         </div>
-                                       </motion.a>
-
-                                           ))}
-                                         </div>
-                                       </div>
-                                     )}
-                                     
-                                     {subjectLinks.filter(l => !l.isOfficialSource).length > 0 && (
-                                       <div className="flex flex-col gap-4">
-                                         <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-                                           <BookOpen size={16} className="text-[#09D1C7]" />
-                                           แหล่งสอบเพิ่มเติม
-                                         </h4>
-                                         <div className="flex flex-col gap-4">
-                                           {subjectLinks.filter(l => !l.isOfficialSource).map((link) => (
-                                             
-                                       <motion.a
-                                         href={link.url}
-                                         target="_blank"
-                                         rel="noopener noreferrer"
-                                         key={link.id}
-                                         initial={{ opacity: 0, y: 10 }}
-                                         animate={{ opacity: 1, y: 0 }}
-                                         transition={{ duration: 0.3 }}
-                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7]/40 dark:hover:border-[#46DFB1]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
-                                       >
-                                                                                   <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#46DFB1] group-hover/card:scale-110 transition-transform duration-300">
-                                            {subject.shortName === "Math" && <Calculator className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Phys" && <Atom className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Chem" && <FlaskConical className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                            {subject.shortName === "Bio" && <Dna className="w-8 h-8 sm:w-10 sm:h-10" />}
-                                          </div>
-                                         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                           <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#09D1C7] transition-colors line-clamp-1">
-                                             {link.title}
-                                           </h3>
-                                           <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
-                                             {link.description}
-                                           </p>
-                                           
-                                         </div>
-                                         <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] transition-colors pr-2">
-                                           <ExternalLink size={20} />
-                                         </div>
-                                       </motion.a>
-
-                                           ))}
-                                         </div>
-                                       </div>
-                                     )}
-                                  </div>
-                               )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pb-10">
+                {filteredSourceLinks.length === 0 ? (
+                  <div className="col-span-1 md:col-span-2 text-center py-10 text-neutral-700 dark:text-neutral-400">
+                    ไม่พบแหล่งข้อมูลที่ค้นหาในหมวดหมู่นี้
+                  </div>
+                ) : (
+                  filteredSourceLinks.map((link) => (
+                    <motion.a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      key={link.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                    >
+                      <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
+                        <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={link.subjects?.[0] === "คณิตศาสตร์" ? "Math" : link.subjects?.[0] === "ฟิสิกส์" ? "Phys" : link.subjects?.[0] === "เคมี" ? "Chem" : link.subjects?.[0] === "ชีววิทยา" ? "Bio" : "All"} />
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <h3 className="text-base sm:text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] dark:group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors line-clamp-1">
+                          {link.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                          {link.description}
+                        </p>
+                      </div>
+                      <div className="hidden sm:flex text-neutral-700 group-hover/card:text-[#09D1C7] dark:group-hover/card:text-[#FF00FF] dark:text-[#FF00FF] transition-colors pr-2">
+                        <ExternalLink size={20} />
+                      </div>
+                    </motion.a>
+                  ))
+                )}
               </div>
             </motion.div>
           )}
-
           {currentView === "portfolio" && (
             <motion.section
               key="portfolio"
@@ -816,7 +982,7 @@ export default function App() {
                 <h2 className="text-3xl sm:text-4xl font-black text-neutral-700 dark:text-neutral-100 mb-3 tracking-tight">
                   Student Portfolios
                 </h2>
-                <div className="h-1 w-12 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] mx-auto rounded-full mb-4" />
+                <div className="h-1 w-12 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] mx-auto rounded-full mb-4" />
                 <p className="text-neutral-700 dark:text-white/90 max-w-xl mx-auto transition-colors">
                   รวบรวมลิ้งก์เเฟ้มสะสมผลงานของพี่ๆในปีต่างๆ ในหลากหลายสาขาเเละมหาวิทยาลัย
                 </p>
@@ -827,7 +993,7 @@ export default function App() {
                 {/* ช่องค้นหา */}
                 <div className="relative group w-full">
                   <Search
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:group-focus-within:text-[#09D1C7] transition-colors"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] dark:group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] transition-colors"
                     size={20}
                   />
                   <input
@@ -835,7 +1001,7 @@ export default function App() {
                     value={portfolioSearch}
                     onChange={(e) => setPortfolioSearch(e.target.value)}
                     placeholder="ค้นหาชื่อผู้จัดทำ คณะ มหาวิทยาลัย หรือแท็ก..."
-                    className="w-full bg-[#f0f2f5] dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-10 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7]/50 dark:focus:ring-[#46DFB1]/50 focus:border-transparent transition-all shadow-sm"
+                    className="w-full bg-white/40 dark:bg-neutral-950 border border-neutral-300/80 dark:border-neutral-800 rounded-xl py-3 pl-12 pr-10 text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-700 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]/50 dark:focus:ring-[#FF00FF]/50 focus:border-transparent transition-all shadow-sm"
                   />
                   {portfolioSearch && (
                     <button
@@ -868,9 +1034,9 @@ export default function App() {
                             <img
                               src={
                                 link.coverImageUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)
-                                  ? `https://drive.google.com/thumbnail?id=${
+                                  ? `https://lh3.googleusercontent.com/d/${
                                       link.coverImageUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1]
-                                    }&sz=w800`
+                                    }=w800`
                                   : link.coverImageUrl
                               }
                               alt={`${link.ownerName || "Portfolio"} cover`}
@@ -881,10 +1047,10 @@ export default function App() {
                                 const target = e.currentTarget as HTMLImageElement;
                                 if (!target.dataset.failed) {
                                   target.dataset.failed = "true";
-                                  // If it's a drive URL, fallback to uc?export=view just in case
+                                  // If it's a drive URL, fallback to lh3 just in case
                                   const match = link.coverImageUrl?.match(/\/d\/([a-zA-Z0-9_-]+)/);
                                   if (match && match[1]) {
-                                    target.src = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                                    target.src = `https://lh3.googleusercontent.com/d/${match[1]}=w1000`;
                                   } else {
                                     target.style.display = 'none';
                                   }
@@ -935,7 +1101,7 @@ export default function App() {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] hover:opacity-90 active:scale-95 text-white rounded-none shadow-lg shadow-[#09D1C7]/30 dark:shadow-[#46DFB1]/20 transition-all duration-300 hover:scale-105 flex items-center justify-center group/btn text-xs sm:text-sm font-bold whitespace-nowrap"
+                                className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] hover:opacity-90 active:scale-95 text-white rounded-none shadow-lg shadow-[#09D1C7]/30 dark:shadow-[#FF0000]/20 transition-all duration-300 hover:scale-105 flex items-center justify-center group/btn text-xs sm:text-sm font-bold whitespace-nowrap"
                                 title="ดูพอร์ต"
                               >
                                 <span>ดูพอร์ต</span>
@@ -968,7 +1134,7 @@ export default function App() {
                         setPortfolioSearch("");
                         setSelectedPortfolioTag("All");
                       }}
-                      className="mt-2 text-xs font-bold text-[#09D1C7] hover:text-[#09D1C7] underline uppercase tracking-wider"
+                      className="mt-2 text-xs font-bold text-[#09D1C7] dark:text-[#FF00FF] hover:text-[#09D1C7] dark:text-[#FF00FF] underline uppercase tracking-wider"
                     >
                       ล้างตัวกรองทั้งหมด
                     </button>
@@ -979,8 +1145,8 @@ export default function App() {
               {/* แหล่งเพิ่มเติม */}
               <div className="w-full px-4 sm:px-0 max-w-3xl mx-auto mt-16 flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
-                  <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1]">
-                    <GraduationCap className="w-8 h-8 text-[#09D1C7] dark:text-[#46DFB1] shrink-0" />
+                  <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
+                    <GraduationCap className="w-8 h-8 text-[#09D1C7] dark:text-[#FF00FF] shrink-0" />
                     แหล่งเพิ่มเติม
                   </h3>
                   <p className="text-neutral-700 dark:text-white/90 text-sm">
@@ -996,7 +1162,7 @@ export default function App() {
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <h4 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover:text-[#09D1C7] dark:group-hover:text-[#46DFB1] line-clamp-1 transition-colors">
+                          <h4 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover:text-[#09D1C7] dark:group-hover:text-[#FF00FF] line-clamp-1 transition-colors">
                             {link.title}
                           </h4>
                           <div className="flex flex-wrap items-center gap-1.5">
@@ -1018,7 +1184,7 @@ export default function App() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-gradient-to-r hover:from-[#09D1C7] hover:to-[#46DFB1] text-neutral-700 dark:text-neutral-300 hover:text-white dark:hover:text-white rounded-xl text-sm font-medium transition-all sm:shrink-0 hover:-translate-y-0.5 active:scale-95 group-hover:shadow-md group-hover:shadow-[#09D1C7]/20"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-gradient-to-r hover:from-[#09D1C7] hover:to-[#46DFB1] dark:hover:from-[#FF00FF] dark:hover:to-[#FF0000] text-neutral-700 dark:text-neutral-300 hover:text-white dark:hover:text-white rounded-xl text-sm font-medium transition-all sm:shrink-0 hover:-translate-y-0.5 active:scale-95 group-hover:shadow-md group-hover:shadow-[#09D1C7]/20 dark:group-hover:shadow-[#FF0000]/20"
                       >
                         เข้าสู่เว็บไซต์
                         <ExternalLink size={16} />
@@ -1041,19 +1207,36 @@ export default function App() {
             <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-900/50">
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
-                  <Settings className="w-6 h-6 text-[#09D1C7]" />
+                  <Settings className="w-6 h-6 text-[#09D1C7] dark:text-[#FF00FF]" />
                   จัดการแหล่งข้อสอบ & โลโก้
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 mt-1">
                   เพิ่ม แก้ไข ลบ แหล่งข้อสอบ หรือเปลี่ยนโลโก้ด้วยลิงก์รูปภาพจาก Google Drive
                 </p>
               </div>
-              <button 
-                onClick={() => setIsManageModalOpen(false)}
-                className="p-2 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-400 transition-colors cursor-pointer"
-              >
-                <XCircle className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (window.confirm("คุณต้องการรีเซ็ตข้อมูลแหล่งข้อสอบกลับเป็นค่าเริ่มต้นทั้งหมดหรือไม่?")) {
+                      localStorage.removeItem("customExternalLinks");
+                      localStorage.removeItem("customSourceLinks");
+                      setLocalExternalLinks([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
+                      setLocalSourceLinks(sourceLinks);
+                    }
+                  }}
+                  className="px-3 py-1.5 text-sm bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                  title="รีเซ็ตเป็นค่าเริ่มต้น"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="hidden sm:inline">รีเซ็ต</span>
+                </button>
+                <button 
+                  onClick={() => setIsManageModalOpen(false)}
+                  className="p-2 rounded-xl hover:bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-400 transition-colors cursor-pointer"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
@@ -1080,9 +1263,9 @@ export default function App() {
                       setLocalExternalLinks([...localExternalLinks, newItem]);
                       setEditingLink(newItem);
                     }}
-                    className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] flex items-center gap-1 hover:underline cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5 text-[#09D1C7]" />
+                    <Plus className="w-3.5 h-3.5 text-[#09D1C7] dark:text-[#FF00FF]" />
                     เพิ่มใหม่
                   </button>
                 </div>
@@ -1097,7 +1280,7 @@ export default function App() {
                         onClick={() => setEditingLink(link)}
                         className={`w-full text-left p-3 rounded-xl transition-all border cursor-pointer ${
                           isSelected 
-                            ? 'bg-neutral-100 dark:bg-neutral-800/80 border-[#09D1C7] text-[#09D1C7]' 
+                            ? 'bg-neutral-100 dark:bg-neutral-800/80 border-[#09D1C7] dark:border-[#FF00FF] text-[#09D1C7] dark:text-[#FF00FF]' 
                             : 'border-neutral-100 dark:border-neutral-800 hover:border-neutral-200 dark:hover:border-neutral-700 text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
@@ -1109,12 +1292,11 @@ export default function App() {
                                 alt={link.title} 
                                 referrerPolicy="no-referrer"
                                 className="w-full h-full object-contain"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                              onLoad={(e) => { e.currentTarget.style.display = 'block'; }}
                               />
                             ) : (
-                              <BookOpen className="w-4 h-4 text-[#09D1C7]" />
+                              <BookOpen className="w-4 h-4 text-[#09D1C7] dark:text-[#FF00FF]" />
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -1131,7 +1313,7 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     if (confirm("คุณต้องการรีเซ็ตแหล่งข้อสอบทั้งหมดกลับไปเป็นค่าเริ่มต้นหรือไม่?")) {
-                      setLocalExternalLinks(externalLinks);
+                      setLocalExternalLinks([...mathLinks, ...physicsLinks, ...chemistryLinks, ...biologyLinks]);
                       setEditingLink(null);
                     }
                   }}
@@ -1169,7 +1351,7 @@ export default function App() {
                         <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">ชื่อแหล่งข้อสอบ</label>
                         <input 
                           type="text"
-                          className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7]"
+                          className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF]"
                           value={editingLink.title}
                           onChange={(e) => {
                             const updated = { ...editingLink, title: e.target.value };
@@ -1184,7 +1366,7 @@ export default function App() {
                         <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">ลิงก์ URL</label>
                         <input 
                           type="text"
-                          className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7]"
+                          className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF]"
                           value={editingLink.url}
                           onChange={(e) => {
                             const updated = { ...editingLink, url: e.target.value };
@@ -1200,7 +1382,7 @@ export default function App() {
                       <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-400">คำอธิบาย</label>
                       <textarea 
                         rows={2}
-                        className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7] resize-none"
+                        className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF] resize-none"
                         value={editingLink.description}
                         onChange={(e) => {
                           const updated = { ...editingLink, description: e.target.value };
@@ -1220,12 +1402,11 @@ export default function App() {
                               alt="Logo Preview" 
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-contain"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                              onLoad={(e) => { e.currentTarget.style.display = 'block'; }}
                             />
                           ) : (
-                            <BookOpen className="w-6 h-6 text-[#09D1C7]" />
+                            <BookOpen className="w-6 h-6 text-[#09D1C7] dark:text-[#FF00FF]" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1236,7 +1417,7 @@ export default function App() {
                       <input 
                         type="text"
                         placeholder="https://drive.google.com/file/d/... หรือ https://..."
-                        className="mt-3 w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7]"
+                        className="mt-3 w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-[#09D1C7] dark:border-[#FF00FF] dark:focus:border-[#FF00FF]"
                         value={editingLink.logoUrl || ""}
                         onChange={(e) => {
                           const updated = { ...editingLink, logoUrl: e.target.value };
@@ -1259,7 +1440,7 @@ export default function App() {
                                 <input 
                                   type="checkbox"
                                   checked={hasSubj}
-                                  className="rounded border-neutral-300 text-[#09D1C7] focus:ring-[#09D1C7]"
+                                  className="rounded border-neutral-300 text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
                                   onChange={() => {
                                     let newSubjs = [...(editingLink.subjects || [])];
                                     if (hasSubj) {
@@ -1290,7 +1471,7 @@ export default function App() {
                                 <input 
                                   type="checkbox"
                                   checked={hasEt}
-                                  className="rounded border-neutral-300 text-[#09D1C7] focus:ring-[#09D1C7]"
+                                  className="rounded border-neutral-300 text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
                                   onChange={() => {
                                     let newEts = [...(editingLink.examTypes || [])];
                                     if (hasEt) {
@@ -1319,7 +1500,7 @@ export default function App() {
                               type="radio"
                               name="isOfficial"
                               checked={editingLink.isOfficialSource === true}
-                              className="text-[#09D1C7] focus:ring-[#09D1C7]"
+                              className="text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
                               onChange={() => {
                                 const updated = { ...editingLink, isOfficialSource: true };
                                 setEditingLink(updated);
@@ -1333,7 +1514,7 @@ export default function App() {
                               type="radio"
                               name="isOfficial"
                               checked={editingLink.isOfficialSource !== true}
-                              className="text-[#09D1C7] focus:ring-[#09D1C7]"
+                              className="text-[#09D1C7] dark:text-[#FF00FF] focus:ring-[#09D1C7] dark:focus:ring-[#FF00FF]"
                               onChange={() => {
                                 const updated = { ...editingLink, isOfficialSource: false };
                                 setEditingLink(updated);
@@ -1352,7 +1533,7 @@ export default function App() {
                         onClick={() => {
                           setIsManageModalOpen(false);
                         }}
-                        className="px-6 py-2.5 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] text-white font-semibold rounded-xl text-sm shadow-md hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 cursor-pointer animate-pulse"
+                        className="px-6 py-2.5 bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-white font-semibold rounded-xl text-sm shadow-md hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 cursor-pointer animate-pulse"
                       >
                         <Save className="w-4 h-4" />
                         เสร็จสิ้น & บันทึก
@@ -1386,7 +1567,7 @@ export default function App() {
                 Feedback
               </a>
               <span className="text-neutral-700 dark:text-neutral-400">|</span>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">
+              <a href="http://instagram.com/smdacademic" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">
                 <Instagram size={18} />
               </a>
             </p>

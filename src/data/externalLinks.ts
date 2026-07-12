@@ -1,31 +1,60 @@
 import { ExternalLinkItem } from '../types';
 
-export const externalLinks: ExternalLinkItem[] = [
+/**
+ * คำแนะนำในการใส่โลโก้ (logoUrl):
+ * - สามารถใช้ลิงก์รูปภาพทั่วไปได้ (เช่น https://example.com/logo.png)
+ * - หรือใช้ลิงก์แชร์จาก Google Drive ได้โดยตรง โดยนำลิงก์แชร์มาวางได้เลย
+ *   (ระบบจะแปลงลิงก์ Google Drive เป็น Direct Link แสดงผลรูปภาพให้โดยอัตโนมัติ)
+ */
+
+export const mathLinks: ExternalLinkItem[] = [
   {
-    id: 'ext1',
-    title: 'รวมข้อสอบเก่า สอวน. (Official)',
-    description: 'เว็บไซต์หลักของมูลนิธิ สอวน. ที่รวบรวมข้อสอบคัดเลือกค่าย 1 และค่าย 2 พร้อมเฉลยบางปี',
-    url: 'https://www.posn.or.th/',
-    subjects: ['รวมทุกวิชา'],
-    isOfficialSource: true,
-    examTypes: ['สอวน. (POSN)']
-  },
-  {
-    id: 'ext2',
+    id: 'math1',
     title: 'Rath Center Mathematics',
     description: 'รวบรวมข้อสอบคณิตศาสตร์มัธยมปลาย สมาคมคณิตศาสตร์ สอวน. และข้อสอบแข่งขันคณิตศาสตร์ต่างๆ มากมาย',
     url: 'http://www.rathcenter.com/',
     subjects: ['คณิตศาสตร์'],
     isOfficialSource: true,
-    examTypes: ['สอวน. (POSN)', 'TCAS / A-Level']
-  },
+    examTypes: ['สอวน. (POSN)', 'TCAS / A-Level'],
+    logoUrl: ''
+  }
+];
+
+export const physicsLinks: ExternalLinkItem[] = [
   {
-    id: 'ext3',
-    title: 'โฟลเดอร์ Google Drive พี่ๆ รวมไว้ให้',
-    description: 'รวมข้อสอบเก่าฟิสิกส์ เคมี ชีวะ จากรุ่นพี่หลายๆ ปี (คุณสามารถเปลี่ยนลิงก์ตรงนี้ได้ในโค้ด)',
+    id: 'phys1',
+    title: 'รวมข้อสอบฟิสิกส์',
+    description: 'แหล่งรวมข้อสอบเก่าฟิสิกส์ (เปลี่ยนลิงก์ได้เลย)',
     url: '#',
-    subjects: ['ฟิสิกส์', 'เคมี', 'ชีววิทยา'],
+    subjects: ['ฟิสิกส์'],
     isOfficialSource: false,
-    examTypes: ['TCAS / A-Level']
+    examTypes: ['TCAS / A-Level'],
+    logoUrl: ''
+  }
+];
+
+export const chemistryLinks: ExternalLinkItem[] = [
+  {
+    id: 'chem1',
+    title: 'รวมข้อสอบเคมี',
+    description: 'แหล่งรวมข้อสอบเก่าเคมี (เปลี่ยนลิงก์ได้เลย)',
+    url: '#',
+    subjects: ['เคมี'],
+    isOfficialSource: false,
+    examTypes: ['TCAS / A-Level'],
+    logoUrl: ''
+  }
+];
+
+export const biologyLinks: ExternalLinkItem[] = [
+  {
+    id: 'bio1',
+    title: 'รวมข้อสอบชีววิทยา',
+    description: 'แหล่งรวมข้อสอบเก่าชีววิทยา (เปลี่ยนลิงก์ได้เลย)',
+    url: '#',
+    subjects: ['ชีววิทยา'],
+    isOfficialSource: false,
+    examTypes: ['TCAS / A-Level'],
+    logoUrl: ''
   }
 ];
