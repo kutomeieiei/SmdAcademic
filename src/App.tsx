@@ -36,7 +36,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import oripiusIcon from "./assets/icons/oripius.png";
+
 import { mathLinks, physicsLinks, chemistryLinks, biologyLinks, englishLinks } from "./data/externalLinks";
 import { portfolioLinks } from "./data/portfolioLinks";
 import { sourceLinks } from "./data/sourceLinks";
@@ -252,12 +252,9 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                <img src={oripiusIcon} alt="Profile" className="w-full h-full object-cover" /> 
-              </div>
               <div className="flex flex-col">
                 <h1 className="font-bold text-2xl leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-colors">
-                  Oripius
+                  Smd Academic
                 </h1>
                 <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-400 transition-colors mt-0.5">
                   Hope and Dream
@@ -273,16 +270,16 @@ export default function App() {
                 Home
               </button>
               <button
-                onClick={() => setCurrentView("source")}
-                className={`text-sm font-bold transition-colors ${currentView === "source" ? "text-neutral-700 dark:text-neutral-100" : "text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
-              >
-                Source
-              </button>
-              <button
                 onClick={() => setCurrentView("exams")}
                 className={`text-sm font-bold transition-colors ${currentView === "exams" ? "text-neutral-700 dark:text-neutral-100" : "text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
               >
                 Exams
+              </button>
+              <button
+                onClick={() => setCurrentView("source")}
+                className={`text-sm font-bold transition-colors ${currentView === "source" ? "text-neutral-700 dark:text-neutral-100" : "text-neutral-700 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100"}`}
+              >
+                Source
               </button>
               <button
                 onClick={() => setCurrentView("portfolio")}
@@ -402,10 +399,10 @@ export default function App() {
                 {/* Removed Ambient Background Glow Container for minimal look */}
 
                 <div className="text-center px-4 max-w-3xl mx-auto flex flex-col items-center gap-6 relative z-[30] w-full">
-                  <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight whitespace-nowrap text-neutral-700 dark:text-white">
-                    ยินดีต้อนรับเข้าสู่{" "}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
-                      Oripius
+                  <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight text-neutral-700 dark:text-white">
+                    ยินดีต้อนรับเข้าสู่{" "}<br className="md:hidden" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] whitespace-nowrap">
+                      SMD ACADEMIC
                     </span>
                   </h2>
                   <p className="text-lg text-neutral-700 dark:text-white/90 max-w-xl">
@@ -425,7 +422,7 @@ export default function App() {
                       Exams
                     </h3>
                     <p className="text-neutral-700 dark:text-white/90 text-lg leading-relaxed mb-2">
-                      รวบรวมข้อสอบเก่าจากหลากหลายสนามสอบเช่น ข้อสอบสอวน. หรือข้อสอบเข้ามหาวิทยาลัยชั้นนำต่างๆ เพื่อเป็นเเหล่งฝึกฝน ทบทวนความรู้ของพี่ๆเพื่อนๆน้องๆทุกคน สำหรับการเตรียมความพร้อมก่อนสอบสนามต่างๆ
+                      รวบรวมข้อสอบจากเเหล่งข้อสอบต่างๆ เพื่อเป็นที่ฝึกฝนทบทวนความรู้ของทุกคน สำหรับการเตรียมความพร้อมก่อนสอบสนามต่างๆ
                     </p>
                     <button
                       onClick={() => setCurrentView("exams")}
@@ -479,10 +476,26 @@ export default function App() {
                   <div className="flex flex-col gap-3">
                     <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
                       <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl font-normal -rotate-12 transform">✦</span>
+                      Sources
+                    </h3>
+                    <p className="text-neutral-700 dark:text-white/90 text-lg leading-relaxed mb-2">
+                      รวบรวมเเหล่งเเบบฝึกหัดเเละเเหล่งเนื้อหาสรุปวิชาต่างๆ เพื่อเรียนรู้ได้ง่ายมากขึ้น 
+                    </p>
+                    <button
+                      onClick={() => setCurrentView("source")}
+                      className="mt-1 w-fit px-8 py-3 bg-neutral-200 dark:bg-[#f8f9fa]/10 text-neutral-700 dark:text-white border border-neutral-300 dark:border-white/20 hover:bg-neutral-300 dark:hover:bg-[#f8f9fa]/20 rounded-xl font-medium transition-colors shadow-sm active:scale-95"
+                    >
+                      ไปหน้า Sources
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-2xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">
+                      <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl font-normal -rotate-12 transform">✦</span>
                       Portfolio
                     </h3>
                     <p className="text-neutral-700 dark:text-white/90 text-lg leading-relaxed mb-2">
-                      รวบรวมเเฟ้มสะสมผลงานของพี่ๆที่จบไปเเล้ว เพื่อเเบ่งปันไอเดีย หรือข้อมูลต่างๆ เป็นเเนวทางในการยื่นรอบพอร์ต เพื่อเตรียมความพร้อมของน้องๆในการเข้าสู่มหาวิทยาลัยในฝันอย่างมั่นใจ
+                      รวบรวมเเฟ้มสะสมผลงานของพี่ๆ เพื่อเเบ่งปันไอเดีย ข้อมูล เป็นเเนวทางในการเก็บพอร์ตฟอลิโอในระบบ Tcasfolio สำหรับการยื่นมหาลัย
                     </p>
                     <button
                       onClick={() => setCurrentView("portfolio")}
@@ -507,11 +520,11 @@ export default function App() {
             >
               <div className="flex flex-col gap-2 items-center">
                 <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] text-3xl md:text-5xl mb-4 font-normal -rotate-12 transform">✦</span>
-                <h2 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-500 tracking-tight transition-colors">
-                  We Are Oripius Academic Team
+                <h2 className="text-[1.3rem] sm:text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-500 tracking-tight transition-colors whitespace-nowrap">
+                  We Are <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">SMD Academic</span> Team
                 </h2>
                 <h3 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] mt-2">
-                  SMD Leadership 44
+                  Run by SMD Leadership 44
                 </h3>
               </div>
 
@@ -528,15 +541,27 @@ export default function App() {
                 </p>
                 <div className="w-full text-center mt-6">
                   <p className="font-semibold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] relative inline-block">
-                    จุดหมายที่ดูไกล มันจะใกล้
+                    Rise while they rest
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col items-start gap-6 mt-8 pt-10 border-t border-neutral-200/50 dark:border-neutral-800/50 w-full text-left">
                 <h3 className="text-xl font-bold text-neutral-700 dark:text-white">Contact Us</h3>
-                <div className="w-full text-left text-neutral-700 dark:text-neutral-400">
-                  สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] hover:underline font-bold">Feedback</a>
+                <div className="w-full flex flex-col gap-3 text-left text-neutral-700 dark:text-neutral-400">
+                  <div>
+                    สามารถรายงานปัญหา ข้อเสนอหรือสิ่งที่อยากให้ทำได้ที่นี้ <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] hover:underline font-bold">Feedback</a>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div>
+                      <span className="font-bold text-neutral-800 dark:text-neutral-200">Instagram:</span>{" "}
+                      <a href="https://instagram.com/smdacademic" target="_blank" rel="noopener noreferrer" className="hover:text-[#09D1C7] dark:hover:text-[#FF00FF] transition-colors">SmdAcademic</a>
+                    </div>
+                    <div>
+                      <span className="font-bold text-neutral-800 dark:text-neutral-200">Gmail:</span>{" "}
+                      <a href="mailto:smdacademic44@gmail.com" className="hover:text-[#09D1C7] dark:hover:text-[#FF00FF] transition-colors">smdacademic44@gmail.com</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.section>
@@ -560,7 +585,7 @@ export default function App() {
                   </span>
                 </h2>
                 <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
-                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือ Mock-test จากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
+                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือแบบฝึกหัดจากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
                 </p>
               </div>
 
@@ -678,7 +703,7 @@ export default function App() {
                   </span>
                 </h2>
                 <p className="text-md text-neutral-700 dark:text-white/90 max-w-xl transition-colors">
-                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือ Mock-test จากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
+                  รวบรวมช่องทางดาวน์โหลดหรือที่มาสำหรับข้อสอบต่างๆ ไม่ว่าจะเป็นจากผู้ออกข้อสอบโดยตรง หรือแบบฝึกหัดจากติวเตอร์สถาบันต่างๆ ครอบคลุมหลากหลายวิชาสำหรับน้องๆทุกคน
                 </p>
               </div>
 
@@ -1285,7 +1310,7 @@ export default function App() {
               <Copyright size={18} strokeWidth={2} />
             </div>
             <p className="text-neutral-700 dark:text-neutral-400 text-xs sm:text-sm transition-colors flex items-center gap-2 sm:gap-3">
-              <span className="truncate">เว็บไซต์ฝ่ายวิชาการของพรรค Oripius</span>
+              <span className="truncate">เว็บไซต์ฝ่ายวิชาการของ SMD</span>
               <span className="text-neutral-700 dark:text-neutral-400">|</span>
               <a href="https://forms.gle/hTcHcqe53K5iifR68" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors whitespace-nowrap">
                 Feedback
