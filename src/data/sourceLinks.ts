@@ -21,7 +21,7 @@ export const sourceLinks: ExternalLinkItem[] = [
     description: 'GiveAway สรุปชีวะบทต่างๆสำหรับเข้าค่ายหนึ่งจนไปถึง TBO',
     url: 'https://www.instagram.com/bio.krit/',
     tags: ['ชีวะ', 'สรุปเนื้อหา']
-  }
+  },
   {
     id: 'src4',
     title: 'finalcall.tutor',
