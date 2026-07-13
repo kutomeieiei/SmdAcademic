@@ -13,7 +13,7 @@ export const sourceLinks: ExternalLinkItem[] = [
     title: 'เเบบฝึกหัด Grammar อังกฤษ',
     description: 'Grammar 16000 ข้อพร้อมเฉลยโดย Atalay Oguz',
     url: ' https://staff.tiiame.uz/storage/users/247/books/GnGozbEwKKuzJeFZwlP44jd4P7XPAoUUz9lMqJEX.pdf',
-    tags: ['อังกฤษ', 'เเบบฝึกหัด']
+    tags: ['อังกฤษ', 'แบบฝึกหัด']
   },
   {
     id: 'src3',
