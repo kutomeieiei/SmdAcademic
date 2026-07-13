@@ -71,7 +71,7 @@ function ExamSourceLogo({ logoUrl, title, shortName }: ExamSourceLogoProps) {
 
   if (directLink && !imageError) {
     return (
-      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl p-[1.5px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] shadow-sm transition-transform duration-300">
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-[1.5px] bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] shadow-sm transition-transform duration-300">
         <img
           src={directLink}
           alt={title}
@@ -85,10 +85,11 @@ function ExamSourceLogo({ logoUrl, title, shortName }: ExamSourceLogoProps) {
 
   return (
     <>
-      {shortName === "Math" && <Calculator className="w-8 h-8 sm:w-10 sm:h-10" />}
-      {shortName === "Phys" && <Atom className="w-8 h-8 sm:w-10 sm:h-10" />}
-      {shortName === "Chem" && <FlaskConical className="w-8 h-8 sm:w-10 sm:h-10" />}
-      {shortName === "Bio" && <Dna className="w-8 h-8 sm:w-10 sm:h-10" />}
+      {shortName === "Math" && <Calculator className="w-12 h-12 sm:w-14 sm:h-14" />}
+      {shortName === "Phys" && <Atom className="w-12 h-12 sm:w-14 sm:h-14" />}
+      {shortName === "Chem" && <FlaskConical className="w-12 h-12 sm:w-14 sm:h-14" />}
+      {shortName === "Bio" && <Dna className="w-12 h-12 sm:w-14 sm:h-14" />}
+      {shortName === "Eng" && <BookOpen className="w-12 h-12 sm:w-14 sm:h-14" />}
     </>
   );
 }
@@ -248,13 +249,14 @@ export default function App() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/30 dark:bg-[#050505]/80 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-900/50 transition-colors">
+      <header className="sticky top-0 z-50 bg-[#EEECEC] dark:bg-[#0a0a0a] border-b border-neutral-200/50 dark:border-neutral-900/50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-4">
               <div className="flex flex-col">
-                <h1 className="font-bold text-2xl leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000] transition-colors">
-                  Smd Academic
+                <h1 className="font-bold text-2xl leading-none transition-colors">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#09D1C7] to-[#46DFB1] dark:from-[#FF00FF] dark:to-[#FF0000]">Smd</span>{" "}
+                  <span className="text-neutral-900 dark:text-white">Academic</span>
                 </h1>
                 <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-400 transition-colors mt-0.5">
                   Hope and Dream
@@ -328,7 +330,7 @@ export default function App() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="sm:hidden border-t border-neutral-200/50 dark:border-neutral-800 bg-white/60 dark:bg-neutral-950 backdrop-blur-md overflow-hidden"
+              className="sm:hidden border-t border-neutral-200/50 dark:border-neutral-900/50 bg-[#EEECEC] dark:bg-[#0a0a0a] overflow-hidden"
             >
               <div className="px-4 py-4 flex flex-col gap-4">
                 <button
@@ -642,7 +644,7 @@ export default function App() {
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                             className="overflow-hidden"
                           >
-                            <div className="p-4 sm:p-6 bg-white/30 dark:bg-[#0a0a0a]/50 backdrop-blur-sm">
+                            <div className="p-4 sm:p-6 bg-transparent">
                                {subjectLinks.length === 0 ? (
                                   <div className="text-center py-10 text-neutral-700 dark:text-neutral-400">
                                     ไม่พบแหล่งข้อสอบที่ค้นหาในหมวดหมู่นี้
@@ -658,9 +660,9 @@ export default function App() {
                                          initial={{ opacity: 0, y: 10 }}
                                          animate={{ opacity: 1, y: 0 }}
                                          transition={{ duration: 0.3 }}
-                                         className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                                         className="w-full bg-white/40 dark:bg-[#121212] border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
                                        >
-                                         <div className="flex-shrink-0 w-12 sm:w-14 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
+                                         <div className="flex-shrink-0 w-16 sm:w-20 flex items-center justify-center text-[#09D1C7] dark:text-[#FF00FF] group-hover/card:scale-110 transition-transform duration-300">
                                             <ExamSourceLogo logoUrl={link.logoUrl} title={link.title} shortName={subject.shortName} />
                                           </div>
                                          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
@@ -781,7 +783,7 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
-                        className="w-full bg-transparent border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
+                        className="w-full bg-white/40 dark:bg-[#121212] border border-neutral-200 dark:border-neutral-800/60 rounded-xl p-4 hover:border-[#09D1C7] dark:border-[#FF00FF]/40 dark:hover:border-[#FF00FF]/45 transition-all flex flex-row items-center gap-4 text-left group/card"
                       >
                       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                         {link.title && (
@@ -833,7 +835,7 @@ export default function App() {
                 {/* ช่องค้นหา */}
                 <div className="relative group w-full">
                   <Search
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-400 group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] dark:group-focus-within:text-[#09D1C7] dark:text-[#FF00FF] transition-colors"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-[#09D1C7] dark:group-focus-within:text-[#FF00FF] transition-colors"
                     size={20}
                   />
                   <input
@@ -1005,16 +1007,6 @@ export default function App() {
                           <h4 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 group-hover:text-[#09D1C7] dark:group-hover:text-[#FF00FF] line-clamp-1 transition-colors">
                             {link.title}
                           </h4>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {link.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-400 px-2 py-0.5 rounded-full whitespace-nowrap transition-colors"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
                         </div>
                         <p className="text-sm text-neutral-700 dark:text-white/90 transition-colors leading-relaxed">
                           {link.description}
@@ -1027,7 +1019,6 @@ export default function App() {
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/50 hover:bg-gradient-to-r hover:from-[#09D1C7] hover:to-[#46DFB1] dark:hover:from-[#FF00FF] dark:hover:to-[#FF0000] text-neutral-700 dark:text-neutral-300 hover:text-white dark:hover:text-white rounded-xl text-sm font-medium transition-all sm:shrink-0 hover:-translate-y-0.5 active:scale-95 group-hover:shadow-md group-hover:shadow-[#09D1C7]/20 dark:group-hover:shadow-[#FF0000]/20"
                       >
                         เข้าสู่เว็บไซต์
-                        <ExternalLink size={16} />
                       </a>
                     </div>
                   ))}
