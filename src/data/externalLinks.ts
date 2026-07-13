@@ -40,10 +40,10 @@ export const chemistryLinks: ExternalLinkItem[] = [
 export const biologyLinks: ExternalLinkItem[] = [
   {
     id: 'bio1',
-    title: 'รวมข้อสอบชีววิทยา',
-    description: 'แหล่งรวมข้อสอบเก่าชีววิทยา (เปลี่ยนลิงก์ได้เลย)',
-    url: '#',
-    logoUrl: ''
+    title: 'สอวนชีววิทยา',
+    description: 'ข้อสอบ + เฉลยทำโดย bioloomaa',
+    url: 'https://drive.google.com/drive/folders/1qnTWkv1x6XRSNXOiPdkfEgafqJ3bUdWQ',
+    logoUrl: 'https://drive.google.com/file/d/1TSjLLBWd6XAXlaJDTgpv5eHyfklc8VUg/view?usp=drivesdk'
   }
 ];
 
@@ -56,4 +56,3 @@ export const englishLinks: ExternalLinkItem[] = [
     logoUrl: 'https://drive.google.com/file/d/1iWHLZN8oUCwcbDpVD6h1wc2cVJCpU8-9/view?usp=drive_link'
   }
 ];
-
