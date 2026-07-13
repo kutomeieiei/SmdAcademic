@@ -10,20 +10,20 @@ import { ExternalLinkItem } from '../types';
 export const mathLinks: ExternalLinkItem[] = [
   {
     id: 'math1',
-    title: 'Rath Center Mathematics',
-    description: 'รวบรวมข้อสอบคณิตศาสตร์มัธยมปลาย สมาคมคณิตศาสตร์ สอวน. และข้อสอบแข่งขันคณิตศาสตร์ต่างๆ มากมาย',
-    url: 'http://www.rathcenter.com/',
-    logoUrl: ''
+    title: 'Netsat คณิต',
+    description: 'รวบรวมข้อสอบ Netsat คณิตปี 63-69',
+    url: 'https://drive.google.com/drive/folders/1fwajz7dGyTb8_HHoEydIgs9-yvaEVe2v',
+    logoUrl: 'https://drive.google.com/file/d/15Gwq5x6j-0ly7yRpnUDlOOb47_3GYwM7/view?usp=drivesdk'
   }
 ];
 
 export const physicsLinks: ExternalLinkItem[] = [
   {
     id: 'phys1',
-    title: 'รวมข้อสอบฟิสิกส์',
-    description: 'แหล่งรวมข้อสอบเก่าฟิสิกส์ (เปลี่ยนลิงก์ได้เลย)',
-    url: '#',
-    logoUrl: ''
+    title: 'สอวนฟิสิกส์',
+    description: 'ข้อสอบสอวนค่าย1-3 + เฉลยรวบรวมโดย Tonson physics',
+    url: 'https://sites.google.com/view/tonsonphysics/%E0%B8%84%E0%B8%A5%E0%B8%87%E0%B8%82%E0%B8%AD%E0%B8%AA%E0%B8%AD%E0%B8%9A/%E0%B8%82%E0%B8%AD%E0%B8%AA%E0%B8%AD%E0%B8%9A%E0%B9%82%E0%B8%AD%E0%B8%A5%E0%B8%A1%E0%B8%9B%E0%B8%81%E0%B8%9F%E0%B8%AA%E0%B8%81%E0%B8%AA?authuser=0',
+    logoUrl: 'https://drive.google.com/file/d/1TSjLLBWd6XAXlaJDTgpv5eHyfklc8VUg/view?usp=drivesdk'
   }
 ];
 
