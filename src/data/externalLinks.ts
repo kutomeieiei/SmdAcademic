@@ -11,7 +11,7 @@ export const mathLinks: ExternalLinkItem[] = [
   {
     id: 'math1',
     title: 'Netsat คณิต',
-    description: 'รวบรวมข้อสอบ Netsat คณิตปี 63-69',
+    description: 'รวบรวมข้อสอบ + เฉลย Netsat คณิตปี 63-69',
     url: 'https://drive.google.com/drive/folders/1fwajz7dGyTb8_HHoEydIgs9-yvaEVe2v',
     logoUrl: 'https://drive.google.com/file/d/15Gwq5x6j-0ly7yRpnUDlOOb47_3GYwM7/view?usp=drivesdk'
   }
@@ -30,10 +30,10 @@ export const physicsLinks: ExternalLinkItem[] = [
 export const chemistryLinks: ExternalLinkItem[] = [
   {
     id: 'chem1',
-    title: 'รวมข้อสอบเคมี',
-    description: 'แหล่งรวมข้อสอบเก่าเคมี (เปลี่ยนลิงก์ได้เลย)',
-    url: '#',
-    logoUrl: ''
+    title: 'Netsat เคมี',
+    description: 'รวบรวมข้อสอบ Netsat เคมี',
+    url: 'https://drive.google.com/drive/folders/15dw6GeKzyOIckCsiERm7mfTeLhnDb6Kp',
+    logoUrl: 'https://drive.google.com/file/d/15Gwq5x6j-0ly7yRpnUDlOOb47_3GYwM7/view?usp=drivesdk'
   }
 ];
 
