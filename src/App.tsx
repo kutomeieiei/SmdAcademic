@@ -557,7 +557,7 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <div>
                       <span className="font-bold text-neutral-800 dark:text-neutral-200">Instagram:</span>{" "}
-                      <a href="https://instagram.com/smdacademic" target="_blank" rel="noopener noreferrer" className="hover:text-[#09D1C7] dark:hover:text-[#FF00FF] transition-colors">SmdAcademic</a>
+                      <a href="https://instagram.com/smdacademic" target="_blank" rel="noopener noreferrer" className="hover:text-[#09D1C7] dark:hover:text-[#FF00FF] transition-colors">smdacademic</a>
                     </div>
                     <div>
                       <span className="font-bold text-neutral-800 dark:text-neutral-200">Gmail:</span>{" "}
